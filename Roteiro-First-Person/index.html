@@ -61,7 +61,6 @@
             <label for="videoTitle" class="block text-sm font-medium text-gray-400">TÍTULO DO VÍDEO (EM INGLÊS)</label>
             <input type="text" id="videoTitle" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" placeholder="Ex: My parents sold my house while I was on vacation...">
             
-            <!-- NOVO CAMPO PARA NÚMERO DE PARTES -->
             <div class="space-y-2">
                 <label for="partsCount" class="block text-sm font-medium text-gray-400">Quantas partes você deseja? (mínimo 3)</label>
                 <input type="number" id="partsCount" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" value="16" min="3">
@@ -108,7 +107,7 @@
         // --- Referências aos Elementos do DOM ---
         const apiKeyInput = document.getElementById('apiKeyInput');
         const videoTitleInput = document.getElementById('videoTitle');
-        const partsCountInput = document.getElementById('partsCount'); // Novo
+        const partsCountInput = document.getElementById('partsCount');
         const generateButton = document.getElementById('generateButton');
         const statusContainer = document.getElementById('statusContainer');
         const statusText = document.getElementById('statusText');
@@ -143,7 +142,7 @@
          * Constrói o prompt para a API com base na parte atual da história.
          */
         function buildPromptForPart(partNumber, totalParts, title, previousScript) {
-            // PROMPT ATUALIZADO COM NOVAS DIRETIVAS
+            // PROMPT ATUALIZADO COM REGRA MAIS RÍGIDA
             const baseInstructions = `
                 Analyze the following instructions to generate a part of a long story.
                 Your task is to write a script in American English.
@@ -152,28 +151,28 @@
                 - **Total Length:** ${totalParts} parts of ~1000 words each.
                 - **Point of View:** First-person narrator.
                 - **Language:** 100% American English.
-                - **Style:** Documentary-style, first-person storytelling. The tone must be personal, relatable, and authentic, as if a real person is recounting their own experiences. The language should be common and "homemade," avoiding anything that sounds overly artistic or artificial.
-                - **Comment Hooks:** You MUST include exactly THREE natural-sounding questions or prompts for the audience to comment on throughout the entire script. These should feel like a genuine question to the viewer. Place one in the first part, one in the middle part, and one in the final part. Do not ask for comments in any other part. For example: "Have you ever felt like this? Let me know in the comments." or "What would you have done in my situation? I'd love to read your thoughts."
+                - **Style:** Documentary-style, first-person storytelling. The tone must be personal, relatable, and authentic.
+                - **Comment Hooks:** You MUST include exactly THREE natural-sounding questions for the audience to comment on throughout the entire script. Place one in the first part, one in the middle part, and one in the final part. Example: "What would you have done? Let me know below."
                 - **Structure:**
                     1. The FIRST part must be a powerful introduction with a strong hook.
                     2. The LAST part must be an extensive and satisfying conclusion.
-                - **Format:** The output must be a single, continuous block of text. No chapter titles, no breaks, no unnecessary metadata.
+                - **Format:** The output must be a single, continuous block of text. No chapter titles, no breaks.
+                - **CRITICAL: Content Purity:** Your response MUST BE ONLY the spoken words of the narrator. Do NOT include any parenthetical remarks, action descriptions (like "He smiles"), scene settings, camera directions, or any text that is not part of the direct narration. The output must be a clean script ready for a text-to-speech engine.
             `;
             
             const middlePart = Math.ceil(totalParts / 2);
 
             if (partNumber === 1) {
-                return `${baseInstructions}\n\n**Current Task:**\nYou are writing **Part 1 of ${totalParts}**. This is the introduction. It must be around 1000 words.\nThe video title is: **"${title}"**.\nYour primary goal is to create a powerful introduction with a strong hook that captivates the audience. After the hook, begin the flashback to establish the family context. **Crucially, you must include the FIRST of the three comment hooks naturally within this part.**`;
+                return `${baseInstructions}\n\n**Current Task:**\nYou are writing **Part 1 of ${totalParts}**. This is the introduction. It must be around 1000 words.\nThe video title is: **"${title}"**.\nYour primary goal is to create a powerful introduction. After the hook, begin the flashback. **Crucially, you must include the FIRST of the three comment hooks naturally within this part.** Remember the Content Purity rule: only narration.`;
             } else if (partNumber === middlePart) {
                  const context = previousScript.split(' ').slice(-200).join(' ');
-                 return `${baseInstructions}\n\n**Current Task:**\nYou are writing **Part ${partNumber} of ${totalParts}**. This is the middle of the story. It must be around 1000 words.\n**Crucially, you must include the SECOND of the three comment hooks naturally within this part,** relating it to the current events of the narrative.\n\nHere is the end of the previous part to give you context:\n"...${context}"\n\nContinue the narrative from where it left off.`;
-            }
-            else if (partNumber === totalParts) {
+                 return `${baseInstructions}\n\n**Current Task:**\nYou are writing **Part ${partNumber} of ${totalParts}**. This is the middle of the story. It must be around 1000 words.\n**Crucially, you must include the SECOND of the three comment hooks naturally within this part.** Remember the Content Purity rule.\n\nHere is the end of the previous part to give you context:\n"...${context}"\n\nContinue the narrative from where it left off.`;
+            } else if (partNumber === totalParts) {
                  const context = previousScript.split(' ').slice(-200).join(' ');
-                 return `${baseInstructions}\n\n**Current Task:**\nYou are writing the **Final Part, ${partNumber} of ${totalParts}**. This is the conclusion. It must be around 1000 words.\nWrap up the story, resolve the main conflict, and provide a satisfying ending. **Crucially, you must include the THIRD and FINAL comment hook naturally within this concluding part.**\n\nHere is the end of the previous part to give you context:\n"...${context}"\n\nContinue from there to write the final thoughts.`;
+                 return `${baseInstructions}\n\n**Current Task:**\nYou are writing the **Final Part, ${partNumber} of ${totalParts}**. This is the conclusion. It must be around 1000 words.\nWrap up the story and resolve the main conflict. **Crucially, you must include the THIRD and FINAL comment hook naturally within this concluding part.** Remember the Content Purity rule.\n\nHere is the end of the previous part to give you context:\n"...${context}"\n\nContinue from there to write the final thoughts.`;
             } else {
                 const context = previousScript.split(' ').slice(-200).join(' ');
-                return `${baseInstructions}\n\n**Current Task:**\nYou are continuing the story. You must write **Part ${partNumber} of ${totalParts}**. It must be around 1000 words. Do NOT include a comment hook in this part.\nThe video title is: **"${title}"**.\n\nHere is the end of the previous part to give you context:\n"...${context}"\n\nContinue the narrative from exactly where it left off.`;
+                return `${baseInstructions}\n\n**Current Task:**\nYou are continuing the story. You must write **Part ${partNumber} of ${totalParts}**. It must be around 1000 words. Do NOT include a comment hook in this part.\nThe video title is: **"${title}"**.\nRemember the Content Purity rule: only narration.\n\nHere is the end of the previous part to give you context:\n"...${context}"\n\nContinue the narrative from exactly where it left off.`;
             }
         }
         
@@ -199,7 +198,7 @@
             fullScript = '';
             scriptOutput.value = '';
             updateCounters();
-            updateUIState(true, totalParts);
+            updateUIState(true);
 
             try {
                 for (let i = 1; i <= totalParts; i++) {
@@ -240,7 +239,7 @@
                 generationConfig: {
                     temperature: 0.7,
                     topP: 0.95,
-                    maxOutputTokens: 8192, // Aumentado para acomodar 1000 palavras com folga
+                    maxOutputTokens: 8192,
                 }
             };
 
@@ -323,7 +322,7 @@
             generateButton.disabled = isLoading;
             videoTitleInput.disabled = isLoading;
             apiKeyInput.disabled = isLoading;
-            partsCountInput.disabled = isLoading; // Desabilita também o campo de partes
+            partsCountInput.disabled = isLoading;
             downloadButton.disabled = isLoading || !fullScript;
 
             if (isLoading) {
