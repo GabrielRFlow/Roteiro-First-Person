@@ -53,7 +53,6 @@
 
         <!-- Área de Input -->
         <div class="space-y-4">
-            <!-- CAMPO DE API ADICIONADO NOVAMENTE -->
             <div class="space-y-2">
                 <label for="apiKeyInput" class="block text-sm font-medium text-gray-400">Chave da API (Obrigatório para uso externo)</label>
                 <input type="password" id="apiKeyInput" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" placeholder="Cole sua chave de API aqui para usar o app externamente">
@@ -61,9 +60,16 @@
 
             <label for="videoTitle" class="block text-sm font-medium text-gray-400">TÍTULO DO VÍDEO (EM INGLÊS)</label>
             <input type="text" id="videoTitle" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" placeholder="Ex: My parents sold my house while I was on vacation...">
+            
+            <!-- NOVO CAMPO PARA NÚMERO DE PARTES -->
+            <div class="space-y-2">
+                <label for="partsCount" class="block text-sm font-medium text-gray-400">Quantas partes você deseja? (mínimo 3)</label>
+                <input type="number" id="partsCount" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" value="16" min="3">
+            </div>
+
             <button id="generateButton" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center space-x-2 btn-premium">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-play-circle"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
-                <span>Gerar Roteiro (12.800 palavras)</span>
+                <span>Gerar Roteiro</span>
             </button>
         </div>
 
@@ -100,8 +106,9 @@
 
     <script type="module">
         // --- Referências aos Elementos do DOM ---
-        const apiKeyInput = document.getElementById('apiKeyInput'); // Adicionado de volta
+        const apiKeyInput = document.getElementById('apiKeyInput');
         const videoTitleInput = document.getElementById('videoTitle');
+        const partsCountInput = document.getElementById('partsCount'); // Novo
         const generateButton = document.getElementById('generateButton');
         const statusContainer = document.getElementById('statusContainer');
         const statusText = document.getElementById('statusText');
@@ -113,7 +120,6 @@
         const charCountEl = document.getElementById('charCount');
 
         // --- Variáveis de Estado ---
-        const TOTAL_PARTS = 16;
         let isGenerating = false;
         let fullScript = '';
         
@@ -136,38 +142,38 @@
         /**
          * Constrói o prompt para a API com base na parte atual da história.
          */
-        function buildPromptForPart(partNumber, title, previousScript) {
+        function buildPromptForPart(partNumber, totalParts, title, previousScript) {
+            // PROMPT ATUALIZADO COM NOVAS DIRETIVAS
             const baseInstructions = `
                 Analyze the following instructions to generate a part of a long story.
-                Your task is to write a script in American English. The script must be part of a larger story of approximately 12,800 words.
+                Your task is to write a script in American English.
 
                 **Core Narrative Instructions:**
-                - **Total Length:** 16 parts of ~800 words each. Focus on quality, flow, and conciseness over word count.
+                - **Total Length:** ${totalParts} parts of ~1000 words each.
                 - **Point of View:** First-person narrator.
                 - **Language:** 100% American English.
-                - **Style:** Documentary-style, first-person storytelling. The tone must be personal, relatable, and authentic, as if a real person is recounting their own experiences. The language should be common and "homemade," avoiding anything that sounds overly artistic, cinematic, or artificial. The goal is to create a direct and genuine connection with the audience.
-                - **Themes:** Overcoming family scorn/injustice, silent determination, moral revenge (without violence), the importance of genuine allies, and public validation.
+                - **Style:** Documentary-style, first-person storytelling. The tone must be personal, relatable, and authentic, as if a real person is recounting their own experiences. The language should be common and "homemade," avoiding anything that sounds overly artistic or artificial.
+                - **Comment Hooks:** You MUST include exactly THREE natural-sounding questions or prompts for the audience to comment on throughout the entire script. These should feel like a genuine question to the viewer. Place one in the first part, one in the middle part, and one in the final part. Do not ask for comments in any other part. For example: "Have you ever felt like this? Let me know in the comments." or "What would you have done in my situation? I'd love to read your thoughts."
                 - **Structure:**
-                    1. Powerful Hook Introduction
-                    2. Painful Family Context (Flashback)
-                    3. Escalation of suffering and micro-aggressions.
-                    4. Protagonist's Turning Point (finding inner strength).
-                    5. Secret Personal Achievement (building a business, career, etc.).
-                    6. Public Climax (a wedding, family gathering, etc.).
-                    7. Emotional Confrontation (using truth, not yelling).
-                    8. Satisfying Conclusion, followed by a final reflection.
-                - **Format:** The output must be a single, continuous block of text. No chapter titles, no breaks, no unnecessary metadata. It should be ready for a text-to-speech AI.
-                - **Prohibitions:** No main character deaths, no magic solutions, no simplistic language. Redemption for aggressors only if it is public and genuine.
+                    1. The FIRST part must be a powerful introduction with a strong hook.
+                    2. The LAST part must be an extensive and satisfying conclusion.
+                - **Format:** The output must be a single, continuous block of text. No chapter titles, no breaks, no unnecessary metadata.
             `;
+            
+            const middlePart = Math.ceil(totalParts / 2);
 
             if (partNumber === 1) {
-                return `${baseInstructions}\n\n**Current Task:**\nYou are writing **Part 1 of 16**. This is the most crucial part for audience retention. It should be around 800 words.\nThe video title is: **"${title}"**.\nYour primary goal is to create a powerful introduction with strong hooks that are intriguing and captivating. Start by directly addressing the audience, recounting a shocking or intriguing moment that will be explained later. This intro should make the viewer NEED to know what happened. After the initial hook, begin the flashback to establish the painful family context.`;
-            } else if (partNumber === TOTAL_PARTS) {
-                 const context = previousScript.split(' ').slice(-150).join(' ');
-                 return `${baseInstructions}\n\n**Current Task:**\nYou are writing the **Final Part, 16 of 16**, the "Finalization". It should be around 800 words.\nThe main story has concluded. Your task is to write a final reflection from the narrator. This part should wrap up the story and the video. The narrator should reflect on the journey, the lessons learned, and their new reality. It should provide a sense of closure and empowerment to the audience, ending the video on a powerful and satisfying note.\n\nHere is the end of the previous part to give you context:\n"...${context}"\n\nContinue from there to write the final thoughts. Do NOT repeat the context provided.`;
+                return `${baseInstructions}\n\n**Current Task:**\nYou are writing **Part 1 of ${totalParts}**. This is the introduction. It must be around 1000 words.\nThe video title is: **"${title}"**.\nYour primary goal is to create a powerful introduction with a strong hook that captivates the audience. After the hook, begin the flashback to establish the family context. **Crucially, you must include the FIRST of the three comment hooks naturally within this part.**`;
+            } else if (partNumber === middlePart) {
+                 const context = previousScript.split(' ').slice(-200).join(' ');
+                 return `${baseInstructions}\n\n**Current Task:**\nYou are writing **Part ${partNumber} of ${totalParts}**. This is the middle of the story. It must be around 1000 words.\n**Crucially, you must include the SECOND of the three comment hooks naturally within this part,** relating it to the current events of the narrative.\n\nHere is the end of the previous part to give you context:\n"...${context}"\n\nContinue the narrative from where it left off.`;
+            }
+            else if (partNumber === totalParts) {
+                 const context = previousScript.split(' ').slice(-200).join(' ');
+                 return `${baseInstructions}\n\n**Current Task:**\nYou are writing the **Final Part, ${partNumber} of ${totalParts}**. This is the conclusion. It must be around 1000 words.\nWrap up the story, resolve the main conflict, and provide a satisfying ending. **Crucially, you must include the THIRD and FINAL comment hook naturally within this concluding part.**\n\nHere is the end of the previous part to give you context:\n"...${context}"\n\nContinue from there to write the final thoughts.`;
             } else {
-                const context = previousScript.split(' ').slice(-150).join(' ');
-                return `${baseInstructions}\n\n**Current Task:**\nYou are continuing a story. You must write **Part ${partNumber} of 16**. This part should be approximately 800 words and seamlessly continue from the previous part.\nThe video title and central climax is: **"${title}"**.\n\nHere is the end of the previous part to give you context:\n"...${context}"\n\nContinue the narrative from exactly where it left off. Maintain the established personal, documentary-style tone. Escalate the conflict or develop the protagonist's journey according to the overall story structure. Do NOT repeat the context provided.`;
+                const context = previousScript.split(' ').slice(-200).join(' ');
+                return `${baseInstructions}\n\n**Current Task:**\nYou are continuing the story. You must write **Part ${partNumber} of ${totalParts}**. It must be around 1000 words. Do NOT include a comment hook in this part.\nThe video title is: **"${title}"**.\n\nHere is the end of the previous part to give you context:\n"...${context}"\n\nContinue the narrative from exactly where it left off.`;
             }
         }
         
@@ -178,8 +184,14 @@
             if (isGenerating) return;
             
             const title = videoTitleInput.value.trim();
+            const totalParts = parseInt(partsCountInput.value, 10);
+
             if (!title) {
                 alert('Por favor, insira um título para o vídeo.');
+                return;
+            }
+            if (isNaN(totalParts) || totalParts < 3) {
+                alert('O número de partes deve ser no mínimo 3.');
                 return;
             }
 
@@ -187,13 +199,13 @@
             fullScript = '';
             scriptOutput.value = '';
             updateCounters();
-            updateUIState(true);
+            updateUIState(true, totalParts);
 
             try {
-                for (let i = 1; i <= TOTAL_PARTS; i++) {
-                    statusText.textContent = `Gerando Parte ${i} de ${TOTAL_PARTS}... (Isso pode levar um momento)`;
+                for (let i = 1; i <= totalParts; i++) {
+                    statusText.textContent = `Gerando Parte ${i} de ${totalParts}... (Isso pode levar um momento)`;
                     
-                    const prompt = buildPromptForPart(i, title, fullScript);
+                    const prompt = buildPromptForPart(i, totalParts, title, fullScript);
                     const newPart = await callGeminiAPI(prompt);
 
                     fullScript += (fullScript ? '\n\n' : '') + newPart;
@@ -201,7 +213,7 @@
                     scriptOutput.scrollTop = scriptOutput.scrollHeight;
                     updateCounters();
                     
-                    const progressPercentage = (i / TOTAL_PARTS) * 100;
+                    const progressPercentage = (i / totalParts) * 100;
                     progressBar.style.width = `${progressPercentage}%`;
                 }
                 statusText.textContent = 'Roteiro gerado com sucesso!';
@@ -219,8 +231,6 @@
          * Chama a API para gerar texto.
          */
         async function callGeminiAPI(prompt) {
-            // A chave de API do usuário é usada se fornecida.
-            // Se o campo estiver em branco, o ambiente do Gemini injetará a chave necessária.
             const userApiKey = apiKeyInput.value.trim();
             const apiKey = userApiKey || ""; 
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
@@ -230,7 +240,7 @@
                 generationConfig: {
                     temperature: 0.7,
                     topP: 0.95,
-                    maxOutputTokens: 4096,
+                    maxOutputTokens: 8192, // Aumentado para acomodar 1000 palavras com folga
                 }
             };
 
@@ -265,7 +275,7 @@
         }
 
         /**
-         * Lida com a cópia do roteiro para a área de transferência.
+         * Lida com a cópia do roteiro.
          */
         function handleCopyScript() {
             if (!scriptOutput.value) return;
@@ -286,7 +296,7 @@
         }
 
         /**
-         * Lida com o download do roteiro como um arquivo .txt.
+         * Lida com o download do roteiro.
          */
         function handleDownloadScript() {
             if (isGenerating || !fullScript) return;
@@ -312,7 +322,8 @@
         function updateUIState(isLoading) {
             generateButton.disabled = isLoading;
             videoTitleInput.disabled = isLoading;
-            apiKeyInput.disabled = isLoading; // Desabilita o campo da API durante a geração
+            apiKeyInput.disabled = isLoading;
+            partsCountInput.disabled = isLoading; // Desabilita também o campo de partes
             downloadButton.disabled = isLoading || !fullScript;
 
             if (isLoading) {
