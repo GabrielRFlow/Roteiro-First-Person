@@ -61,7 +61,6 @@
             <label for="videoTitle" class="block text-sm font-medium text-gray-400">TÍTULO DO VÍDEO (EM ESPANHOL)</label>
             <input type="text" id="videoTitle" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" placeholder="Ej: Mis padres vendieron mi casa mientras estaba de vacaciones...">
             
-            <!-- CAMPO PARA NÚMERO DE PARTES -->
             <div class="space-y-2">
                 <label for="partsCount" class="block text-sm font-medium text-gray-400">Quantas partes você deseja? (mínimo 3)</label>
                 <input type="number" id="partsCount" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" value="16" min="3">
@@ -108,7 +107,7 @@
         // --- Referências aos Elementos do DOM ---
         const apiKeyInput = document.getElementById('apiKeyInput');
         const videoTitleInput = document.getElementById('videoTitle');
-        const partsCountInput = document.getElementById('partsCount'); // Novo
+        const partsCountInput = document.getElementById('partsCount');
         const generateButton = document.getElementById('generateButton');
         const statusContainer = document.getElementById('statusContainer');
         const statusText = document.getElementById('statusText');
@@ -143,36 +142,37 @@
          * Constrói o prompt para a API em Espanhol.
          */
         function buildPromptForPart(partNumber, totalParts, title, previousScript) {
-            // PROMPT ADAPTADO PARA ESPAÑOL DE MÉXICO COM NOVAS DIRETIVAS
+            // PROMPT ADAPTADO PARA ESPAÑOL COM NOVAS DIRETIVAS
             const baseInstructions = `
                 Analiza las siguientes instrucciones para generar una parte de una historia larga.
                 Tu tarea es escribir un guion en Español de México.
 
                 **Instrucciones Narrativas Clave:**
                 - **Longitud Total:** ${totalParts} partes de ~1000 palabras cada una.
-                - **Punto de Vista:** Narrador en primera persona.
+                - **Punto de Vista:** Narrador en primera persona (siempre femenino).
                 - **Idioma:** 100% Español de México.
-                - **Estilo:** Estilo documental, narración en primera persona. El tono debe ser personal, cercano y auténtico, como si una persona real estuviera contando sus propias experiencias. El lenguaje debe ser común y "casero", evitando cualquier cosa que suene demasiado artística o artificial.
-                - **Ganchos para Comentarios:** DEBES incluir exactamente TRES preguntas o ganchos para que la audiencia comente a lo largo de todo el guion. Deben sonar como una pregunta genuina al espectador. Coloca uno en la primera parte, uno en la parte intermedia y uno en la parte final. No pidas comentarios en ninguna otra parte. Por ejemplo: "¿Alguna vez te has sentido así? Cuéntamelo en los comentarios." o "¿Qué hubieras hecho tú en mi situación? Me encantaría leer lo que piensas."
+                - **Estilo:** Estilo documental, narración en primera persona. El tono debe ser personal, cercano y auténtico.
+                - **Ganchos para Comentarios:** DEBES incluir exactamente TRES preguntas o ganchos para que la audiencia comente a lo largo de todo el guion. Coloca uno en la primera parte, uno en la parte intermedia y uno en la parte final. Ejemplo: "¿Qué hubieras hecho tú? Déjamelo saber en los comentarios."
                 - **Estructura:**
                     1. La PRIMERA parte debe ser una introducción poderosa con un gancho fuerte.
                     2. La ÚLTIMA parte debe ser una conclusión extensa y satisfactoria.
-                - **Formato:** El resultado debe ser un único bloque de texto continuo. Sin títulos de capítulo, sin saltos, sin metadatos innecesarios.
+                - **Formato:** El resultado debe ser un único bloque de texto continuo. Sin títulos de capítulo, sin saltos.
+                - **CRÍTICO: Pureza del Contenido:** Tu respuesta DEBE SER ÚNICAMENTE las palabras habladas por el narrador. NO incluyas comentarios entre paréntesis, descripciones de acciones (como "Él sonríe"), descripciones de escenas, direcciones de cámara o cualquier texto que no sea parte de la narración directa. El resultado debe ser un guion limpio y listo para un motor de texto a voz.
             `;
 
             const middlePart = Math.ceil(totalParts / 2);
 
             if (partNumber === 1) {
-                return `${baseInstructions}\n\n**Tarea Actual:**\nEstás escribiendo la **Parte 1 de ${totalParts}**. Esta es la introducción. Debe tener alrededor de 1000 palabras.\nEl título del video es: **"${title}"**.\nTu objetivo principal es crear una introducción poderosa con un gancho fuerte que cautive a la audiencia. Después del gancho, comienza el flashback para establecer el contexto familiar. **Crucialmente, debes incluir el PRIMERO de los tres ganchos para comentarios de forma natural dentro de esta parte.**`;
+                return `${baseInstructions}\n\n**Tarea Actual:**\nEstás escribiendo la **Parte 1 de ${totalParts}**. Esta es la introducción. Debe tener alrededor de 1000 palabras.\nEl título del video es: **"${title}"**.\n**Introducción del Personaje Principal:** DEBES comenzar el guion presentando al personaje principal femenino. Dale un nombre único que sea contextualmente relevante al título del video y describe brevemente quién es ella. Esta introducción debe fluir directamente hacia el gancho principal de la historia.\n**Mandato de Variedad en la Apertura:** Tienes estrictamente prohibido usar frases de apertura genéricas. Las primeras frases deben ser poderosas, únicas para esta historia, y enganchar inmediatamente al lector en el conflicto central. Después de la introducción del personaje y el gancho, comienza el flashback. **Crucialmente, debes incluir el PRIMERO de los tres ganchos para comentarios de forma natural dentro de esta parte.** Recuerda la regla de Pureza del Contenido: solo narración.`;
             } else if (partNumber === middlePart) {
                  const context = previousScript.split(' ').slice(-200).join(' ');
-                 return `${baseInstructions}\n\n**Tarea Actual:**\nEstás escribiendo la **Parte ${partNumber} de ${totalParts}**. Esta es la mitad de la historia. Debe tener alrededor de 1000 palabras.\n**Crucialmente, debes incluir el SEGUNDO de los tres ganchos para comentarios de forma natural dentro de esta parte,** relacionándolo con los eventos actuales de la narrativa.\n\nAquí está el final de la parte anterior para darte contexto:\n"...${context}"\n\nContinúa la narrativa desde donde se quedó.`;
+                 return `${baseInstructions}\n\n**Tarea Actual:**\nEstás escribiendo la **Parte ${partNumber} de ${totalParts}**. Esta es la mitad de la historia. Debe tener alrededor de 1000 palabras.\n**Crucialmente, debes incluir el SEGUNDO de los tres ganchos para comentarios de forma natural dentro de esta parte,** relacionándolo con los eventos actuales de la narrativa.\nRecuerda la regla de Pureza del Contenido.\n\nAquí está el final de la parte anterior para darte contexto:\n"...${context}"\n\nContinúa la narrativa desde donde se quedó.`;
             } else if (partNumber === totalParts) {
                  const context = previousScript.split(' ').slice(-200).join(' ');
-                 return `${baseInstructions}\n\n**Tarea Actual:**\nEstás escribiendo la **Parte Final, ${partNumber} de ${totalParts}**. Esta es la conclusión. Debe tener alrededor de 1000 palabras.\nCierra la historia, resuelve el conflicto principal y proporciona un final satisfactorio. **Crucialmente, debes incluir el TERCER y ÚLTIMO gancho para comentarios de forma natural dentro de esta parte final.**\n\nAquí está el final de la parte anterior para darte contexto:\n"...${context}"\n\nContinúa desde ahí para escribir los pensamientos finales.`;
+                 return `${baseInstructions}\n\n**Tarea Actual:**\nEstás escribiendo la **Parte Final, ${partNumber} de ${totalParts}**. Esta es la conclusión. Debe tener alrededor de 1000 palabras.\nCierra la historia, resuelve el conflicto principal y proporciona un final satisfactorio. **Crucialmente, debes incluir el TERCER y ÚLTIMO gancho para comentarios de forma natural dentro de esta parte final.** Recuerda la regla de Pureza del Contenido.\n\nAquí está el final de la parte anterior para darte contexto:\n"...${context}"\n\nContinúa desde ahí para escribir los pensamientos finales.`;
             } else {
                 const context = previousScript.split(' ').slice(-200).join(' ');
-                return `${baseInstructions}\n\n**Tarea Actual:**\nEstás continuando una historia. Debes escribir la **Parte ${partNumber} de ${totalParts}**. Debe tener alrededor de 1000 palabras. NO incluyas un gancho para comentarios en esta parte.\nEl título del video es: **"${title}"**.\n\nAquí está el final de la parte anterior para darte contexto:\n"...${context}"\n\nContinúa la narrativa exactamente donde se quedó.`;
+                return `${baseInstructions}\n\n**Tarea Actual:**\nEstás continuando una historia. Debes escribir la **Parte ${partNumber} de ${totalParts}**. Debe tener alrededor de 1000 palabras. NO incluyas un gancho para comentarios en esta parte.\nEl título del video es: **"${title}"**.\nRecuerda la regla de Pureza del Contenido: solo narración.\n\nAquí está el final de la parte anterior para darte contexto:\n"...${context}"\n\nContinúa la narrativa exactamente donde se quedó.`;
             }
         }
         
