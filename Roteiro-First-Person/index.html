@@ -53,6 +53,12 @@
 
         <!-- Área de Input -->
         <div class="space-y-4">
+            <!-- CAMPO DE API ADICIONADO NOVAMENTE -->
+            <div class="space-y-2">
+                <label for="apiKeyInput" class="block text-sm font-medium text-gray-400">Chave da API (Obrigatório para uso externo)</label>
+                <input type="password" id="apiKeyInput" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" placeholder="Cole sua chave de API aqui para usar o app externamente">
+            </div>
+
             <label for="videoTitle" class="block text-sm font-medium text-gray-400">TÍTULO DO VÍDEO (EM INGLÊS)</label>
             <input type="text" id="videoTitle" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" placeholder="Ex: My parents sold my house while I was on vacation...">
             <button id="generateButton" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center space-x-2 btn-premium">
@@ -94,6 +100,7 @@
 
     <script type="module">
         // --- Referências aos Elementos do DOM ---
+        const apiKeyInput = document.getElementById('apiKeyInput'); // Adicionado de volta
         const videoTitleInput = document.getElementById('videoTitle');
         const generateButton = document.getElementById('generateButton');
         const statusContainer = document.getElementById('statusContainer');
@@ -212,7 +219,10 @@
          * Chama a API para gerar texto.
          */
         async function callGeminiAPI(prompt) {
-            const apiKey = ""; // A chave será injetada pelo ambiente.
+            // A chave de API do usuário é usada se fornecida.
+            // Se o campo estiver em branco, o ambiente do Gemini injetará a chave necessária.
+            const userApiKey = apiKeyInput.value.trim();
+            const apiKey = userApiKey || ""; 
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
             
             const payload = {
@@ -233,7 +243,14 @@
             if (!response.ok) {
                 const errorBody = await response.json();
                 console.error("API Error:", errorBody);
-                throw new Error(`Erro na API: ${errorBody?.error?.message || response.statusText}`);
+                let errorMessage = `Erro na API: ${response.statusText}`;
+                if (errorBody?.error?.message) {
+                    errorMessage = `Erro na API: ${errorBody.error.message}`;
+                }
+                if (response.status === 400) {
+                    errorMessage = "Erro: A Chave da API parece ser inválida. Verifique a chave e tente novamente.";
+                }
+                throw new Error(errorMessage);
             }
 
             const result = await response.json();
@@ -295,6 +312,7 @@
         function updateUIState(isLoading) {
             generateButton.disabled = isLoading;
             videoTitleInput.disabled = isLoading;
+            apiKeyInput.disabled = isLoading; // Desabilita o campo da API durante a geração
             downloadButton.disabled = isLoading || !fullScript;
 
             if (isLoading) {
@@ -306,7 +324,6 @@
             }
         }
 
-        // Inicializa o estado dos contadores e botões
         updateCounters();
         updateUIState(false);
     </script>
