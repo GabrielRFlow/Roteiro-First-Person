@@ -142,14 +142,14 @@
          * Constrói o prompt para a API com base na parte atual da história.
          */
         function buildPromptForPart(partNumber, totalParts, title, previousScript) {
-            // PROMPT ATUALIZADO COM NOVA REGRA DE ABERTURA
+            // PROMPT ATUALIZADO COM DIRETIVA DE INTRODUÇÃO DE PERSONAGEM
             const baseInstructions = `
                 Analyze the following instructions to generate a part of a long story.
                 Your task is to write a script in American English.
 
                 **Core Narrative Instructions:**
                 - **Total Length:** ${totalParts} parts of ~1000 words each.
-                - **Point of View:** First-person narrator.
+                - **Point of View:** First-person narrator (always female).
                 - **Language:** 100% American English.
                 - **Style:** Documentary-style, first-person storytelling. The tone must be personal, relatable, and authentic.
                 - **Comment Hooks:** You MUST include exactly THREE natural-sounding questions for the audience to comment on throughout the entire script. Place one in the first part, one in the middle part, and one in the final part. Example: "What would you have done? Let me know below."
@@ -163,7 +163,7 @@
             const middlePart = Math.ceil(totalParts / 2);
 
             if (partNumber === 1) {
-                return `${baseInstructions}\n\n**Current Task:**\nYou are writing **Part 1 of ${totalParts}**. This is the introduction. It must be around 1000 words.\nThe video title is: **"${title}"**.\n**Opening Variety Mandate:** You are strictly forbidden from using generic or repetitive opening phrases like "Okay, here we go," or "So, let's talk about...". You must create a unique, creative, and powerful opening for every script. The first sentence must immediately hook the reader and be directly related to the story's core conflict. After the hook, begin the flashback. **Crucially, you must include the FIRST of the three comment hooks naturally within this part.** Remember the Content Purity rule: only narration.`;
+                return `${baseInstructions}\n\n**Current Task:**\nYou are writing **Part 1 of ${totalParts}**. This is the introduction. It must be around 1000 words.\nThe video title is: **"${title}"**.\n**Main Character Introduction:** You MUST start the script by introducing the female main character. Give her a unique name that is contextually relevant to the video title, and briefly describe who she is. This introduction should flow directly into the main story hook.\n**Opening Variety Mandate:** You are strictly forbidden from using generic opening phrases. The first sentences must be powerful, unique to this story, and immediately hook the reader into the core conflict. After the character introduction and hook, begin the flashback. **Crucially, you must include the FIRST of the three comment hooks naturally within this part.** Remember the Content Purity rule: only narration.`;
             } else if (partNumber === middlePart) {
                  const context = previousScript.split(' ').slice(-200).join(' ');
                  return `${baseInstructions}\n\n**Current Task:**\nYou are writing **Part ${partNumber} of ${totalParts}**. This is the middle of the story. It must be around 1000 words.\n**Crucially, you must include the SECOND of the three comment hooks naturally within this part,** relating it to the current events of the narrative.\nRemember the Content Purity rule.\n\nHere is the end of the previous part to give you context:\n"...${context}"\n\nContinue the narrative from where it left off.`;
