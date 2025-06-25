@@ -60,9 +60,16 @@
 
             <label for="videoTitle" class="block text-sm font-medium text-gray-400">TÍTULO DO VÍDEO (EM ESPANHOL)</label>
             <input type="text" id="videoTitle" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" placeholder="Ej: Mis padres vendieron mi casa mientras estaba de vacaciones...">
+            
+            <!-- CAMPO PARA NÚMERO DE PARTES -->
+            <div class="space-y-2">
+                <label for="partsCount" class="block text-sm font-medium text-gray-400">Quantas partes você deseja? (mínimo 3)</label>
+                <input type="number" id="partsCount" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" value="16" min="3">
+            </div>
+
             <button id="generateButton" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center space-x-2 btn-premium">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-play-circle"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
-                <span>Gerar Roteiro (12.800 palavras)</span>
+                <span>Gerar Roteiro</span>
             </button>
         </div>
 
@@ -101,6 +108,7 @@
         // --- Referências aos Elementos do DOM ---
         const apiKeyInput = document.getElementById('apiKeyInput');
         const videoTitleInput = document.getElementById('videoTitle');
+        const partsCountInput = document.getElementById('partsCount'); // Novo
         const generateButton = document.getElementById('generateButton');
         const statusContainer = document.getElementById('statusContainer');
         const statusText = document.getElementById('statusText');
@@ -112,7 +120,6 @@
         const charCountEl = document.getElementById('charCount');
 
         // --- Variáveis de Estado ---
-        const TOTAL_PARTS = 16;
         let isGenerating = false;
         let fullScript = '';
         
@@ -135,38 +142,37 @@
         /**
          * Constrói o prompt para a API em Espanhol.
          */
-        function buildPromptForPart(partNumber, title, previousScript) {
+        function buildPromptForPart(partNumber, totalParts, title, previousScript) {
+            // PROMPT ADAPTADO PARA ESPAÑOL DE MÉXICO COM NOVAS DIRETIVAS
             const baseInstructions = `
                 Analiza las siguientes instrucciones para generar una parte de una historia larga.
-                Tu tarea es escribir un guion en Español de México. El guion debe ser parte de una historia más grande de aproximadamente 12,800 palabras.
+                Tu tarea es escribir un guion en Español de México.
 
                 **Instrucciones Narrativas Clave:**
-                - **Longitud Total:** 16 partes de ~800 palabras cada una. Enfócate en la calidad, fluidez y concisión sobre el conteo de palabras.
+                - **Longitud Total:** ${totalParts} partes de ~1000 palabras cada una.
                 - **Punto de Vista:** Narrador en primera persona.
                 - **Idioma:** 100% Español de México.
-                - **Estilo:** Estilo documental, narración en primera persona. El tono debe ser personal, cercano y auténtico, como si una persona real estuviera contando sus propias experiencias. El lenguaje debe ser común y "casero", evitando cualquier cosa que suene demasiado artística, cinematográfica o artificial. El objetivo es crear una conexión directa y genuina con la audiencia.
-                - **Temas:** Superar el desprecio/injusticia familiar, determinación silenciosa, venganza moral (sin violencia), la importancia de aliados genuinos y validación pública.
+                - **Estilo:** Estilo documental, narración en primera persona. El tono debe ser personal, cercano y auténtico, como si una persona real estuviera contando sus propias experiencias. El lenguaje debe ser común y "casero", evitando cualquier cosa que suene demasiado artística o artificial.
+                - **Ganchos para Comentarios:** DEBES incluir exactamente TRES preguntas o ganchos para que la audiencia comente a lo largo de todo el guion. Deben sonar como una pregunta genuina al espectador. Coloca uno en la primera parte, uno en la parte intermedia y uno en la parte final. No pidas comentarios en ninguna otra parte. Por ejemplo: "¿Alguna vez te has sentido así? Cuéntamelo en los comentarios." o "¿Qué hubieras hecho tú en mi situación? Me encantaría leer lo que piensas."
                 - **Estructura:**
-                    1. Introducción con un gancho poderoso.
-                    2. Contexto familiar doloroso (Flashback).
-                    3. Escalada de sufrimiento y micro-agresiones.
-                    4. Punto de inflexión del protagonista (descubrimiento de fuerza interior).
-                    5. Logro personal oculto (crear un negocio, carrera, etc.).
-                    6. Clímax público (una boda, reunión familiar, etc.).
-                    7. Confrontación emocional (usando la verdad, sin gritos).
-                    8. Conclusión satisfactoria, seguida de una reflexión final.
-                - **Formato:** El resultado debe ser un único bloque de texto continuo. Sin títulos de capítulo, sin saltos, sin metadatos innecesarios. Debe estar listo para una IA de texto a voz.
-                - **Prohibiciones:** No hay muertes de personajes principales, ni soluciones mágicas, ni lenguaje simplista. La redención de los agresores solo si es pública y genuina.
+                    1. La PRIMERA parte debe ser una introducción poderosa con un gancho fuerte.
+                    2. La ÚLTIMA parte debe ser una conclusión extensa y satisfactoria.
+                - **Formato:** El resultado debe ser un único bloque de texto continuo. Sin títulos de capítulo, sin saltos, sin metadatos innecesarios.
             `;
 
+            const middlePart = Math.ceil(totalParts / 2);
+
             if (partNumber === 1) {
-                return `${baseInstructions}\n\n**Tarea Actual:**\nEstás escribiendo la **Parte 1 de 16**. Esta es la parte más crucial para la retención de la audiencia. Debe tener alrededor de 800 palabras.\nEl título del video es: **"${title}"**.\nTu objetivo principal es crear una introducción poderosa con ganchos fuertes que sean intrigantes y cautivadores. Comienza dirigiéndote directamente a la audiencia, relatando un momento impactante o intrigante que se explicará más adelante. Esta introducción debe hacer que el espectador NECESITE saber qué pasó. Después del gancho inicial, comienza el flashback para establecer el doloroso contexto familiar.`;
-            } else if (partNumber === TOTAL_PARTS) {
-                 const context = previousScript.split(' ').slice(-150).join(' ');
-                 return `${baseInstructions}\n\n**Tarea Actual:**\nEstás escribiendo la **Parte Final, 16 de 16**, la "Finalización". Debe tener alrededor de 800 palabras.\nLa historia principal ha concluido. Tu tarea es escribir una reflexión final del narrador. Esta parte debe cerrar la historia y el video. El narrador debe reflexionar sobre el viaje, las lecciones aprendidas y su nueva realidad. Debe proporcionar una sensación de cierre y empoderamiento a la audiencia, terminando el video con una nota poderosa y satisfactoria.\n\nAquí está el final de la parte anterior para darte contexto:\n"...${context}"\n\nContinúa desde ahí para escribir los pensamientos finales. NO repitas el contexto proporcionado.`;
+                return `${baseInstructions}\n\n**Tarea Actual:**\nEstás escribiendo la **Parte 1 de ${totalParts}**. Esta es la introducción. Debe tener alrededor de 1000 palabras.\nEl título del video es: **"${title}"**.\nTu objetivo principal es crear una introducción poderosa con un gancho fuerte que cautive a la audiencia. Después del gancho, comienza el flashback para establecer el contexto familiar. **Crucialmente, debes incluir el PRIMERO de los tres ganchos para comentarios de forma natural dentro de esta parte.**`;
+            } else if (partNumber === middlePart) {
+                 const context = previousScript.split(' ').slice(-200).join(' ');
+                 return `${baseInstructions}\n\n**Tarea Actual:**\nEstás escribiendo la **Parte ${partNumber} de ${totalParts}**. Esta es la mitad de la historia. Debe tener alrededor de 1000 palabras.\n**Crucialmente, debes incluir el SEGUNDO de los tres ganchos para comentarios de forma natural dentro de esta parte,** relacionándolo con los eventos actuales de la narrativa.\n\nAquí está el final de la parte anterior para darte contexto:\n"...${context}"\n\nContinúa la narrativa desde donde se quedó.`;
+            } else if (partNumber === totalParts) {
+                 const context = previousScript.split(' ').slice(-200).join(' ');
+                 return `${baseInstructions}\n\n**Tarea Actual:**\nEstás escribiendo la **Parte Final, ${partNumber} de ${totalParts}**. Esta es la conclusión. Debe tener alrededor de 1000 palabras.\nCierra la historia, resuelve el conflicto principal y proporciona un final satisfactorio. **Crucialmente, debes incluir el TERCER y ÚLTIMO gancho para comentarios de forma natural dentro de esta parte final.**\n\nAquí está el final de la parte anterior para darte contexto:\n"...${context}"\n\nContinúa desde ahí para escribir los pensamientos finales.`;
             } else {
-                const context = previousScript.split(' ').slice(-150).join(' ');
-                return `${baseInstructions}\n\n**Tarea Actual:**\nEstás continuando una historia. Debes escribir la **Parte ${partNumber} de 16**. Esta parte debe tener aproximadamente 800 palabras y continuar sin problemas desde la parte anterior.\nEl título del video y el clímax central es: **"${title}"**.\n\nAquí está el final de la parte anterior para darte contexto:\n"...${context}"\n\nContinúa la narrativa exactamente donde se quedó. Mantén el tono personal y de estilo documental establecido. Escala el conflicto o desarrolla el viaje del protagonista de acuerdo con la estructura general de la historia. NO repitas el contexto proporcionado.`;
+                const context = previousScript.split(' ').slice(-200).join(' ');
+                return `${baseInstructions}\n\n**Tarea Actual:**\nEstás continuando una historia. Debes escribir la **Parte ${partNumber} de ${totalParts}**. Debe tener alrededor de 1000 palabras. NO incluyas un gancho para comentarios en esta parte.\nEl título del video es: **"${title}"**.\n\nAquí está el final de la parte anterior para darte contexto:\n"...${context}"\n\nContinúa la narrativa exactamente donde se quedó.`;
             }
         }
         
@@ -177,8 +183,14 @@
             if (isGenerating) return;
             
             const title = videoTitleInput.value.trim();
+            const totalParts = parseInt(partsCountInput.value, 10);
+
             if (!title) {
                 alert('Por favor, insira um título para o vídeo.');
+                return;
+            }
+            if (isNaN(totalParts) || totalParts < 3) {
+                alert('O número de partes deve ser no mínimo 3.');
                 return;
             }
 
@@ -189,10 +201,10 @@
             updateUIState(true);
 
             try {
-                for (let i = 1; i <= TOTAL_PARTS; i++) {
-                    statusText.textContent = `Gerando Parte ${i} de ${TOTAL_PARTS}... (Isso pode levar um momento)`;
+                for (let i = 1; i <= totalParts; i++) {
+                    statusText.textContent = `Gerando Parte ${i} de ${totalParts}... (Isso pode levar um momento)`;
                     
-                    const prompt = buildPromptForPart(i, title, fullScript);
+                    const prompt = buildPromptForPart(i, totalParts, title, fullScript);
                     const newPart = await callGeminiAPI(prompt);
 
                     fullScript += (fullScript ? '\n\n' : '') + newPart;
@@ -200,7 +212,7 @@
                     scriptOutput.scrollTop = scriptOutput.scrollHeight;
                     updateCounters();
                     
-                    const progressPercentage = (i / TOTAL_PARTS) * 100;
+                    const progressPercentage = (i / totalParts) * 100;
                     progressBar.style.width = `${progressPercentage}%`;
                 }
                 statusText.textContent = 'Roteiro gerado com sucesso!';
@@ -227,7 +239,7 @@
                 generationConfig: {
                     temperature: 0.7,
                     topP: 0.95,
-                    maxOutputTokens: 4096,
+                    maxOutputTokens: 8192,
                 }
             };
 
@@ -310,6 +322,7 @@
             generateButton.disabled = isLoading;
             videoTitleInput.disabled = isLoading;
             apiKeyInput.disabled = isLoading;
+            partsCountInput.disabled = isLoading;
             downloadButton.disabled = isLoading || !fullScript;
 
             if (isLoading) {
