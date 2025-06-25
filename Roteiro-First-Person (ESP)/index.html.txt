@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Roteiros em Espanhol</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020617; 
+        }
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background-color: #374151;
+            border-radius: 4px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background-color: #4b5563;
+        }
+        .btn-premium {
+            transition: all 0.3s ease;
+        }
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4), 0 0 25px rgba(139, 92, 246, 0.3);
+        }
+        .main-panel-border {
+             border: 1px solid transparent;
+             background: linear-gradient(#111827, #111827) padding-box, linear-gradient(145deg, #3b82f6, #a855f7) border-box;
+        }
+    </style>
+</head>
+<body class="text-gray-300 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-4xl bg-gray-900 rounded-2xl shadow-2xl shadow-black/50 p-6 md:p-8 space-y-6 main-panel-border">
+        
+        <!-- Cabeçalho em Português -->
+        <div class="text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Gerador de Roteiros em Espanhol</h1>
+            <h2 class="text-lg text-gray-400 mt-2">Historias en Primera Persona (en Español)</h2>
+            <p class="text-xs text-gray-500 mt-1">APP BY: G2R DIGITAL CORPORATION LTDA</p>
+            <p class="text-gray-400 mt-4">Insira o título, tome um café e veja seu roteiro ficar pronto em segundos...</p>
+        </div>
+
+        <!-- Área de Input em Português -->
+        <div class="space-y-4">
+            <div class="space-y-2">
+                <label for="apiKeyInput" class="block text-sm font-medium text-gray-400">Chave da API (Obrigatório para uso externo)</label>
+                <input type="password" id="apiKeyInput" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" placeholder="Cole sua chave de API aqui para usar o app externamente">
+            </div>
+
+            <label for="videoTitle" class="block text-sm font-medium text-gray-400">TÍTULO DO VÍDEO (EM ESPANHOL)</label>
+            <input type="text" id="videoTitle" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" placeholder="Ej: Mis padres vendieron mi casa mientras estaba de vacaciones...">
+            <button id="generateButton" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center space-x-2 btn-premium">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-play-circle"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+                <span>Gerar Roteiro (12.800 palavras)</span>
+            </button>
+        </div>
+
+        <!-- Status e Progresso -->
+        <div id="statusContainer" class="hidden space-y-2 pt-2">
+             <p id="statusText" class="text-center text-blue-400"></p>
+             <div class="w-full bg-gray-700 rounded-full h-2.5">
+                <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-purple-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Área de Output em Português -->
+        <div class="space-y-2">
+            <div class="flex justify-between items-center">
+                <label for="scriptOutput" class="block text-sm font-medium text-gray-400">Roteiro Gerado (em Espanhol):</label>
+                <div class="flex space-x-2">
+                    <button id="copyButton" class="bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-2 px-4 rounded-lg transition-colors text-sm flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        <span>Copiar</span>
+                    </button>
+                    <button id="downloadButton" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span>Baixar</span>
+                    </button>
+                </div>
+            </div>
+            <textarea id="scriptOutput" rows="15" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-3 text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none resize-none" readonly placeholder="O roteiro em espanhol aparecerá aqui..."></textarea>
+            <div id="countersContainer" class="text-right text-sm text-gray-500 space-x-4 pr-2">
+                <span id="wordCount">Palavras: 0</span>
+                <span id="charCount">Caracteres: 0</span>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // --- Referências aos Elementos do DOM ---
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const videoTitleInput = document.getElementById('videoTitle');
+        const generateButton = document.getElementById('generateButton');
+        const statusContainer = document.getElementById('statusContainer');
+        const statusText = document.getElementById('statusText');
+        const progressBar = document.getElementById('progressBar');
+        const scriptOutput = document.getElementById('scriptOutput');
+        const copyButton = document.getElementById('copyButton');
+        const downloadButton = document.getElementById('downloadButton');
+        const wordCountEl = document.getElementById('wordCount');
+        const charCountEl = document.getElementById('charCount');
+
+        // --- Variáveis de Estado ---
+        const TOTAL_PARTS = 16;
+        let isGenerating = false;
+        let fullScript = '';
+        
+        // --- Event Listeners ---
+        generateButton.addEventListener('click', handleGenerateScript);
+        copyButton.addEventListener('click', handleCopyScript);
+        downloadButton.addEventListener('click', handleDownloadScript);
+
+        /**
+         * Atualiza os contadores de palavras e caracteres.
+         */
+        function updateCounters() {
+            const text = scriptOutput.value;
+            const charCount = text.length;
+            const wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            wordCountEl.textContent = `Palavras: ${wordCount.toLocaleString('pt-BR')}`;
+            charCountEl.textContent = `Caracteres: ${charCount.toLocaleString('pt-BR')}`;
+        }
+
+        /**
+         * Constrói o prompt para a API em Espanhol.
+         */
+        function buildPromptForPart(partNumber, title, previousScript) {
+            const baseInstructions = `
+                Analiza las siguientes instrucciones para generar una parte de una historia larga.
+                Tu tarea es escribir un guion en Español de México. El guion debe ser parte de una historia más grande de aproximadamente 12,800 palabras.
+
+                **Instrucciones Narrativas Clave:**
+                - **Longitud Total:** 16 partes de ~800 palabras cada una. Enfócate en la calidad, fluidez y concisión sobre el conteo de palabras.
+                - **Punto de Vista:** Narrador en primera persona.
+                - **Idioma:** 100% Español de México.
+                - **Estilo:** Estilo documental, narración en primera persona. El tono debe ser personal, cercano y auténtico, como si una persona real estuviera contando sus propias experiencias. El lenguaje debe ser común y "casero", evitando cualquier cosa que suene demasiado artística, cinematográfica o artificial. El objetivo es crear una conexión directa y genuina con la audiencia.
+                - **Temas:** Superar el desprecio/injusticia familiar, determinación silenciosa, venganza moral (sin violencia), la importancia de aliados genuinos y validación pública.
+                - **Estructura:**
+                    1. Introducción con un gancho poderoso.
+                    2. Contexto familiar doloroso (Flashback).
+                    3. Escalada de sufrimiento y micro-agresiones.
+                    4. Punto de inflexión del protagonista (descubrimiento de fuerza interior).
+                    5. Logro personal oculto (crear un negocio, carrera, etc.).
+                    6. Clímax público (una boda, reunión familiar, etc.).
+                    7. Confrontación emocional (usando la verdad, sin gritos).
+                    8. Conclusión satisfactoria, seguida de una reflexión final.
+                - **Formato:** El resultado debe ser un único bloque de texto continuo. Sin títulos de capítulo, sin saltos, sin metadatos innecesarios. Debe estar listo para una IA de texto a voz.
+                - **Prohibiciones:** No hay muertes de personajes principales, ni soluciones mágicas, ni lenguaje simplista. La redención de los agresores solo si es pública y genuina.
+            `;
+
+            if (partNumber === 1) {
+                return `${baseInstructions}\n\n**Tarea Actual:**\nEstás escribiendo la **Parte 1 de 16**. Esta es la parte más crucial para la retención de la audiencia. Debe tener alrededor de 800 palabras.\nEl título del video es: **"${title}"**.\nTu objetivo principal es crear una introducción poderosa con ganchos fuertes que sean intrigantes y cautivadores. Comienza dirigiéndote directamente a la audiencia, relatando un momento impactante o intrigante que se explicará más adelante. Esta introducción debe hacer que el espectador NECESITE saber qué pasó. Después del gancho inicial, comienza el flashback para establecer el doloroso contexto familiar.`;
+            } else if (partNumber === TOTAL_PARTS) {
+                 const context = previousScript.split(' ').slice(-150).join(' ');
+                 return `${baseInstructions}\n\n**Tarea Actual:**\nEstás escribiendo la **Parte Final, 16 de 16**, la "Finalización". Debe tener alrededor de 800 palabras.\nLa historia principal ha concluido. Tu tarea es escribir una reflexión final del narrador. Esta parte debe cerrar la historia y el video. El narrador debe reflexionar sobre el viaje, las lecciones aprendidas y su nueva realidad. Debe proporcionar una sensación de cierre y empoderamiento a la audiencia, terminando el video con una nota poderosa y satisfactoria.\n\nAquí está el final de la parte anterior para darte contexto:\n"...${context}"\n\nContinúa desde ahí para escribir los pensamientos finales. NO repitas el contexto proporcionado.`;
+            } else {
+                const context = previousScript.split(' ').slice(-150).join(' ');
+                return `${baseInstructions}\n\n**Tarea Actual:**\nEstás continuando una historia. Debes escribir la **Parte ${partNumber} de 16**. Esta parte debe tener aproximadamente 800 palabras y continuar sin problemas desde la parte anterior.\nEl título del video y el clímax central es: **"${title}"**.\n\nAquí está el final de la parte anterior para darte contexto:\n"...${context}"\n\nContinúa la narrativa exactamente donde se quedó. Mantén el tono personal y de estilo documental establecido. Escala el conflicto o desarrolla el viaje del protagonista de acuerdo con la estructura general de la historia. NO repitas el contexto proporcionado.`;
+            }
+        }
+        
+        /**
+         * Função principal para lidar com a geração do roteiro.
+         */
+        async function handleGenerateScript() {
+            if (isGenerating) return;
+            
+            const title = videoTitleInput.value.trim();
+            if (!title) {
+                alert('Por favor, insira um título para o vídeo.');
+                return;
+            }
+
+            isGenerating = true;
+            fullScript = '';
+            scriptOutput.value = '';
+            updateCounters();
+            updateUIState(true);
+
+            try {
+                for (let i = 1; i <= TOTAL_PARTS; i++) {
+                    statusText.textContent = `Gerando Parte ${i} de ${TOTAL_PARTS}... (Isso pode levar um momento)`;
+                    
+                    const prompt = buildPromptForPart(i, title, fullScript);
+                    const newPart = await callGeminiAPI(prompt);
+
+                    fullScript += (fullScript ? '\n\n' : '') + newPart;
+                    scriptOutput.value = fullScript;
+                    scriptOutput.scrollTop = scriptOutput.scrollHeight;
+                    updateCounters();
+                    
+                    const progressPercentage = (i / TOTAL_PARTS) * 100;
+                    progressBar.style.width = `${progressPercentage}%`;
+                }
+                statusText.textContent = 'Roteiro gerado com sucesso!';
+            } catch (error) {
+                console.error('Erro ao gerar o roteiro:', error);
+                statusText.textContent = `Erro: ${error.message}. Por favor, tente novamente.`;
+                scriptOutput.value += "\n\n--- GERAÇÃO INTERROMPIDA DEVIDO A UM ERRO ---";
+            } finally {
+                isGenerating = false;
+                updateUIState(false);
+            }
+        }
+        
+        /**
+         * Chama a API para gerar texto.
+         */
+        async function callGeminiAPI(prompt) {
+            const userApiKey = apiKeyInput.value.trim();
+            const apiKey = userApiKey || ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: prompt }] }],
+                generationConfig: {
+                    temperature: 0.7,
+                    topP: 0.95,
+                    maxOutputTokens: 4096,
+                }
+            };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorBody = await response.json();
+                console.error("API Error:", errorBody);
+                let errorMessage = `Erro na API: ${response.statusText}`;
+                if (errorBody?.error?.message) {
+                    errorMessage = `Erro na API: ${errorBody.error.message}`;
+                }
+                if (response.status === 400) {
+                    errorMessage = "Erro: A Chave da API parece ser inválida. Verifique a chave e tente novamente.";
+                }
+                throw new Error(errorMessage);
+            }
+
+            const result = await response.json();
+            const candidate = result.candidates?.[0];
+
+            if (candidate?.content?.parts?.[0]?.text) {
+                return candidate.content.parts[0].text;
+            } else {
+                console.error("Resposta inesperada ou incompleta da API:", JSON.stringify(result, null, 2));
+                throw new Error('Não foi possível extrair o texto da resposta da API.');
+            }
+        }
+
+        /**
+         * Lida com a cópia do roteiro.
+         */
+        function handleCopyScript() {
+            if (!scriptOutput.value) return;
+            try {
+                scriptOutput.select();
+                scriptOutput.setSelectionRange(0, 99999); 
+                document.execCommand('copy');
+                const originalText = copyButton.innerHTML;
+                copyButton.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Copiado!</span>
+                `;
+                setTimeout(() => { copyButton.innerHTML = originalText; }, 2000);
+            } catch (err) {
+                console.error('Falha ao copiar: ', err);
+            }
+            window.getSelection()?.removeAllRanges();
+        }
+
+        /**
+         * Lida com o download do roteiro.
+         */
+        function handleDownloadScript() {
+            if (isGenerating || !fullScript) return;
+
+            const title = videoTitleInput.value.trim().replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'guion_generado';
+            const fileContent = `TÍTULO DEL VIDEO: ${videoTitleInput.value.trim()}\n\n---\n\n${fullScript}`;
+            
+            const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
+
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${title}.txt`;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }
+        
+        /**
+         * Atualiza o estado da UI.
+         */
+        function updateUIState(isLoading) {
+            generateButton.disabled = isLoading;
+            videoTitleInput.disabled = isLoading;
+            apiKeyInput.disabled = isLoading;
+            downloadButton.disabled = isLoading || !fullScript;
+
+            if (isLoading) {
+                generateButton.classList.add('opacity-50', 'cursor-not-allowed');
+                statusContainer.classList.remove('hidden');
+                progressBar.style.width = '0%';
+            } else {
+                generateButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        updateCounters();
+        updateUIState(false);
+    </script>
+</body>
+</html>
