@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roteiros Longos de Oração</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020617; 
+        }
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background-color: #374151;
+            border-radius: 4px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background-color: #4b5563;
+        }
+        .btn-premium {
+            transition: all 0.3s ease;
+        }
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4), 0 0 25px rgba(139, 92, 246, 0.3);
+        }
+        .main-panel-border {
+             border: 1px solid transparent;
+             background: linear-gradient(#111827, #111827) padding-box, linear-gradient(145deg, #3b82f6, #a855f7) border-box;
+        }
+    </style>
+</head>
+<body class="text-gray-300 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-4xl bg-gray-900 rounded-2xl shadow-2xl shadow-black/50 p-6 md:p-8 space-y-6 main-panel-border">
+        
+        <!-- Cabeçalho -->
+        <div class="text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Roteiros Longos de Oração</h1>
+            <p class="text-xs text-gray-500 mt-1">APP BY: G2R DIGITAL CORPORATION LTDA</p>
+            <p class="text-gray-400 mt-4">Selecione o canal, tome um café e veja sua oração ficar pronta...</p>
+        </div>
+
+        <!-- Área de Input -->
+        <div class="space-y-4">
+            <div class="space-y-2">
+                <label for="apiKeyInput" class="block text-sm font-medium text-gray-400">Chave da API (Obrigatório para uso externo)</label>
+                <input type="password" id="apiKeyInput" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" placeholder="Cole sua chave de API aqui para usar o app externamente">
+            </div>
+
+            <div class="space-y-2">
+                <label for="channelSelect" class="block text-sm font-medium text-gray-400">Qual canal?</label>
+                <select id="channelSelect" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition">
+                    <option value="honra_divina">Honra Divina</option>
+                    <option value="san_rafael">San Rafael</option>
+                    <option value="oracoes_milagrosas">Orações Milagrosas</option>
+                </select>
+            </div>
+            
+            <!-- CAMPO PARA NÚMERO DE PARTES -->
+            <div class="space-y-2">
+                <label for="partsCount" class="block text-sm font-medium text-gray-400">Quantas partes você deseja? (mínimo 2)</label>
+                <input type="number" id="partsCount" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" value="7" min="2">
+            </div>
+
+            <button id="generateButton" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center space-x-2 btn-premium">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-play-circle"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+                <span>Gerar Oração</span>
+            </button>
+        </div>
+
+        <!-- Status e Progresso -->
+        <div id="statusContainer" class="hidden space-y-2 pt-2">
+             <p id="statusText" class="text-center text-blue-400"></p>
+             <div class="w-full bg-gray-700 rounded-full h-2.5">
+                <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-purple-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Área de Output -->
+        <div class="space-y-2">
+            <div class="flex justify-between items-center">
+                <label for="scriptOutput" class="block text-sm font-medium text-gray-400">Roteiro Gerado:</label>
+                <div class="flex space-x-2">
+                    <button id="copyButton" class="bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-2 px-4 rounded-lg transition-colors text-sm flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        <span>Copiar</span>
+                    </button>
+                    <button id="downloadButton" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span>Baixar</span>
+                    </button>
+                </div>
+            </div>
+            <textarea id="scriptOutput" rows="15" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-3 text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none resize-none" readonly placeholder="Sua oração imersiva aparecerá aqui..."></textarea>
+            <div id="countersContainer" class="text-right text-sm text-gray-500 space-x-4 pr-2">
+                <span id="wordCount">Palavras: 0</span>
+                <span id="charCount">Caracteres: 0</span>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // --- Referências aos Elementos do DOM ---
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const channelSelect = document.getElementById('channelSelect');
+        const partsCountInput = document.getElementById('partsCount');
+        const generateButton = document.getElementById('generateButton');
+        const statusContainer = document.getElementById('statusContainer');
+        const statusText = document.getElementById('statusText');
+        const progressBar = document.getElementById('progressBar');
+        const scriptOutput = document.getElementById('scriptOutput');
+        const copyButton = document.getElementById('copyButton');
+        const downloadButton = document.getElementById('downloadButton');
+        const wordCountEl = document.getElementById('wordCount');
+        const charCountEl = document.getElementById('charCount');
+
+        // --- Variáveis de Estado ---
+        let isGenerating = false;
+        let fullScript = '';
+        
+        // --- Event Listeners ---
+        generateButton.addEventListener('click', handleGenerateScript);
+        copyButton.addEventListener('click', handleCopyScript);
+        downloadButton.addEventListener('click', handleDownloadScript);
+
+        function updateCounters() {
+            const text = scriptOutput.value;
+            const charCount = text.length;
+            const wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            wordCountEl.textContent = `Palavras: ${wordCount.toLocaleString('pt-BR')}`;
+            charCountEl.textContent = `Caracteres: ${charCount.toLocaleString('pt-BR')}`;
+        }
+
+        function getChannelVariables(channel) {
+            switch (channel) {
+                case 'honra_divina':
+                    return {
+                        idioma: "Português - Brasil",
+                        nome_da_entidade: "o Espírito Santo e Jesus Cristo",
+                        genero_gramatical: "masculino",
+                        titulo_1: "Consolador Divino",
+                        titulo_2: "Cordeiro de Deus",
+                        titulo_3: "Rei dos Reis",
+                        atributo_iconico: "o fogo purificador e a espada da verdade",
+                        frase_ou_historia_iconica: "a promessa de que 'Eis que estou convosco todos os dias, até a consumação dos séculos'",
+                        texto_da_oracao_especifica: "Pelo poder que há no nome de Jesus e pela unção do Espírito Santo, eu declaro que toda fortaleza do inimigo em minha vida cai por terra agora!"
+                    };
+                case 'san_rafael':
+                    return {
+                        idioma: "Espanhol - México",
+                        nome_da_entidade: "el Arcángel San Rafael y Jesús",
+                        genero_gramatical: "masculino",
+                        titulo_1: "Medicina de Dios",
+                        titulo_2: "Guía de los Viajeros",
+                        titulo_3: "Sanador Celestial",
+                        atributo_iconico: "su bastón de viajero y el pez de la sanación",
+                        frase_ou_historia_iconica: "su viaje con Tobías, donde trajo sanación y protección",
+                        texto_da_oracao_especifica: "¡Por el poder de la llaga de Cristo y la intercesión de San Rafael, decreto que toda enfermedad y dolencia es arrancada de mi cuerpo y de mi alma ahora!"
+                    };
+                case 'oracoes_milagrosas':
+                    return {
+                        idioma: "Português - Brasil",
+                        nome_da_entidade: "o Arcanjo São Rafael e Jesus",
+                        genero_gramatical: "masculino",
+                        titulo_1: "Medicina de Deus",
+                        titulo_2: "Guia dos Peregrinos",
+                        titulo_3: "Anjo da Cura Divina",
+                        atributo_iconico: "seu cajado de peregrino e o peixe da cura",
+                        frase_ou_historia_iconica: "sua jornada com Tobias, onde trouxe cura e proteção",
+                        texto_da_oracao_especifica: "Pelo poder da chaga de Cristo e pela intercessão de São Rafael, eu decreto que toda doença e enfermidade seja arrancada do meu corpo e da minha alma agora!"
+                    };
+                default:
+                    return {};
+            }
+        }
+
+        function buildPrayerPromptForPart(partNumber, totalParts, variables, previousScript) {
+            // PROMPT ATUALIZADO COM AS NOVAS REGRAS
+            const basePromptTemplate = `
+                Seu Papel:
+                Você é um autor de teologia e espiritualidade, especializado em criar orações e meditações guiadas que são profundas, imersivas e emocionalmente poderosas. Seu estilo é direto, usando a segunda pessoa ('você') para criar uma conexão íntima com o ouvinte, e rico em imagens sensoriais e metáforas de batalha espiritual e cura divina.
+
+                Sua Tarefa Geral:
+                Gerar um roteiro de oração extenso e imersivo, com um total de ${totalParts} partes de aproximadamente 1000 palavras cada. A oração deve seguir uma estrutura temática de 7 estágios, distribuídos ao longo das partes: 1. A Chegada Divina, 2. A Batalha e Libertação, 3. A Cura Profunda, 4. O Ponto de Virada, 5. Decreto da Vitória, 6. Empoderamento, 7. Selo de Proteção.
+
+                Instruções para ESTA PARTE:
+                - **Idioma:** {{idioma}}
+                - **Entidade Alvo:** {{nome_da_entidade}}.
+                - **Títulos da Entidade:** Use estes títulos: {{titulo_1}}, {{titulo_2}}, {{titulo_3}}.
+                - **Comandos:** Mantenha o tom de segunda pessoa ('você', 'sua vida'). Use linguagem sensorial forte ('sinta', 'ouça', 'veja').
+                - **REGRA CRÍTICA:** A sua resposta deve ser APENAS o roteiro pronto para narração. NÃO inicie com frases como "Aqui está a Parte 1..." ou qualquer outro texto que não seja parte da oração em si. Apenas a narração pura.
+            `;
+
+            let finalPrompt = Object.keys(variables).reduce((prompt, key) => {
+                const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
+                return prompt.replace(regex, variables[key]);
+            }, basePromptTemplate);
+            
+            let taskDescription = "";
+            if (partNumber === 1) {
+                taskDescription = `\n\n**Tarefa Específica:**\nVocê está escrevendo a **Parte 1 de ${totalParts}**. Esta é a introdução. Crie uma atmosfera de silêncio e conduza o ouvinte a sentir a presença de {{nome_da_entidade}} (Estágio 1). Deve ser uma introdução poderosa que prenda a atenção. **Ao final desta parte, inclua um gancho natural para comentários.**`;
+            } else if (partNumber === totalParts) {
+                taskDescription = `\n\n**Tarefa Específica:**\nVocê está escrevendo a **Parte Final, ${partNumber} de ${totalParts}**. Esta é a conclusão. Foque nos estágios finais (Empoderamento e Selo de Proteção), garantindo um encerramento extenso e poderoso. **Ao final desta parte, inclua um gancho natural para comentários.**\n\nContexto anterior para continuação:\n"...${previousScript.split(' ').slice(-200).join(' ')}"`;
+            } else {
+                taskDescription = `\n\n**Tarefa Específica:**\nVocê está escrevendo a **Parte ${partNumber} de ${totalParts}**. Continue a progressão da oração de forma lógica através dos 7 estágios temáticos. **Ao final desta parte, inclua um gancho natural para comentários.**\n\nContexto anterior para continuação:\n"...${previousScript.split(' ').slice(-200).join(' ')}"`;
+            }
+            
+            finalPrompt += Object.keys(variables).reduce((prompt, key) => {
+                const regex = new RegExp(`\\{\\{${key}\\}\\}`, 'g');
+                return prompt.replace(regex, variables[key]);
+            }, taskDescription);
+
+            return finalPrompt;
+        }
+        
+        async function handleGenerateScript() {
+            if (isGenerating) return;
+
+            const totalParts = parseInt(partsCountInput.value, 10);
+            if (isNaN(totalParts) || totalParts < 2) {
+                alert('O número de partes deve ser no mínimo 2.');
+                return;
+            }
+
+            const selectedChannel = channelSelect.value;
+            const variables = getChannelVariables(selectedChannel);
+
+            isGenerating = true;
+            fullScript = '';
+            scriptOutput.value = '';
+            updateCounters();
+            updateUIState(true);
+
+            try {
+                for (let i = 1; i <= totalParts; i++) {
+                    statusText.textContent = `Gerando parte ${i} de ${totalParts} para o canal ${channelSelect.options[channelSelect.selectedIndex].text}...`;
+                    
+                    const prompt = buildPrayerPromptForPart(i, totalParts, variables, fullScript);
+                    const newPart = await callGeminiAPI(prompt);
+
+                    fullScript += (fullScript ? '\n\n' : '') + newPart;
+                    scriptOutput.value = fullScript;
+                    scriptOutput.scrollTop = scriptOutput.scrollHeight;
+                    updateCounters();
+                    
+                    progressBar.style.width = `${(i / totalParts) * 100}%`;
+                }
+                statusText.textContent = 'Oração gerada com sucesso!';
+            } catch (error) {
+                console.error('Erro ao gerar a oração:', error);
+                statusText.textContent = `Erro: ${error.message}. Por favor, tente novamente.`;
+                scriptOutput.value += "\n\n--- GERAÇÃO INTERROMPIDA DEVIDO A UM ERRO ---";
+            } finally {
+                isGenerating = false;
+                updateUIState(false);
+            }
+        }
+        
+        async function callGeminiAPI(prompt) {
+            const userApiKey = apiKeyInput.value.trim();
+            const apiKey = userApiKey || ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: prompt }] }],
+                generationConfig: {
+                    temperature: 0.7,
+                    topP: 0.95,
+                    maxOutputTokens: 8192,
+                }
+            };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorBody = await response.json();
+                console.error("API Error:", errorBody);
+                let errorMessage = `Erro na API: ${response.statusText}`;
+                if (errorBody?.error?.message) { errorMessage = `Erro na API: ${errorBody.error.message}`; }
+                if (response.status === 400) { errorMessage = "Erro: A Chave da API parece ser inválida. Verifique a chave e tente novamente."; }
+                throw new Error(errorMessage);
+            }
+
+            const result = await response.json();
+            const candidate = result.candidates?.[0];
+
+            if (candidate?.content?.parts?.[0]?.text) {
+                return candidate.content.parts[0].text;
+            } else {
+                console.error("Resposta inesperada ou incompleta da API:", JSON.stringify(result, null, 2));
+                throw new Error('Não foi possível extrair o texto da resposta da API.');
+            }
+        }
+
+        function handleCopyScript() {
+            if (!scriptOutput.value) return;
+            try {
+                scriptOutput.select();
+                scriptOutput.setSelectionRange(0, 99999); 
+                document.execCommand('copy');
+                const originalText = copyButton.innerHTML;
+                copyButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Copiado!</span>`;
+                setTimeout(() => { copyButton.innerHTML = originalText; }, 2000);
+            } catch (err) {
+                console.error('Falha ao copiar: ', err);
+            }
+            window.getSelection()?.removeAllRanges();
+        }
+
+        function handleDownloadScript() {
+            if (isGenerating || !scriptOutput.value) return;
+            const channelName = channelSelect.options[channelSelect.selectedIndex].text.replace(/\s+/g, '_').toLowerCase();
+            const fileContent = `CANAL: ${channelSelect.options[channelSelect.selectedIndex].text}\n\n---\n\n${scriptOutput.value}`;
+            const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${channelName}_oracao.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }
+        
+        function updateUIState(isLoading) {
+            generateButton.disabled = isLoading;
+            apiKeyInput.disabled = isLoading;
+            channelSelect.disabled = isLoading;
+            partsCountInput.disabled = isLoading;
+            downloadButton.disabled = isLoading || !scriptOutput.value;
+
+            if (isLoading) {
+                generateButton.classList.add('opacity-50', 'cursor-not-allowed');
+                statusContainer.classList.remove('hidden');
+                progressBar.style.width = '0%';
+            } else {
+                generateButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        updateCounters();
+        updateUIState(false);
+    </script>
+</body>
+</html>
