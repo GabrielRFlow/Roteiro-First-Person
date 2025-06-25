@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roteiros - Histórias de Famosos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020617; 
+        }
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background-color: #374151;
+            border-radius: 4px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background-color: #4b5563;
+        }
+        .btn-premium {
+            transition: all 0.3s ease;
+        }
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4), 0 0 25px rgba(139, 92, 246, 0.3);
+        }
+        .main-panel-border {
+             border: 1px solid transparent;
+             background: linear-gradient(#111827, #111827) padding-box, linear-gradient(145deg, #3b82f6, #a855f7) border-box;
+        }
+    </style>
+</head>
+<body class="text-gray-300 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-4xl bg-gray-900 rounded-2xl shadow-2xl shadow-black/50 p-6 md:p-8 space-y-6 main-panel-border">
+        
+        <!-- Cabeçalho -->
+        <div class="text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Roteiros - Histórias de Famosos</h1>
+            <p class="text-xs text-gray-500 mt-1">APP BY: G2R DIGITAL CORPORATION LTDA</p>
+            <p class="text-gray-400 mt-4">Preencha os campos e veja a história ganhar vida...</p>
+        </div>
+
+        <!-- Área de Input -->
+        <div class="space-y-4">
+            <div class="space-y-2">
+                <label for="apiKeyInput" class="block text-sm font-medium text-gray-400">Chave da API (Obrigatório para uso externo)</label>
+                <input type="password" id="apiKeyInput" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" placeholder="Cole sua chave de API aqui para usar o app externamente">
+            </div>
+
+            <label for="videoTitle" class="block text-sm font-medium text-gray-400">Título do Vídeo</label>
+            <input type="text" id="videoTitle" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" placeholder="Ex: A história de como Dante Gebel enfrentou seus maiores medos...">
+            
+            <div class="space-y-2">
+                <label for="characterSelect" class="block text-sm font-medium text-gray-400">Personagem Principal</label>
+                <select id="characterSelect" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition">
+                    <option value="dante_gebel">Pastor Dante Gebel</option>
+                    <option value="luis_toro">Padre Luis Toro</option>
+                </select>
+            </div>
+
+            <div class="space-y-2">
+                <label for="partsCount" class="block text-sm font-medium text-gray-400">Quantas partes você deseja? (mínimo 3)</label>
+                <input type="number" id="partsCount" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" value="10" min="3">
+            </div>
+
+            <button id="generateButton" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center space-x-2 btn-premium">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-play-circle"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+                <span>Gerar Roteiro</span>
+            </button>
+        </div>
+
+        <!-- Status e Progresso -->
+        <div id="statusContainer" class="hidden space-y-2 pt-2">
+             <p id="statusText" class="text-center text-blue-400"></p>
+             <div class="w-full bg-gray-700 rounded-full h-2.5">
+                <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-purple-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Área de Output -->
+        <div class="space-y-2">
+            <div class="flex justify-between items-center">
+                <label for="scriptOutput" class="block text-sm font-medium text-gray-400">Roteiro Gerado (em Espanhol):</label>
+                <div class="flex space-x-2">
+                    <button id="copyButton" class="bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-2 px-4 rounded-lg transition-colors text-sm flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        <span>Copiar</span>
+                    </button>
+                    <button id="downloadButton" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span>Baixar</span>
+                    </button>
+                </div>
+            </div>
+            <textarea id="scriptOutput" rows="15" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-3 text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none resize-none" readonly placeholder="A história sobre o famoso aparecerá aqui..."></textarea>
+            <div id="countersContainer" class="text-right text-sm text-gray-500 space-x-4 pr-2">
+                <span id="wordCount">Palavras: 0</span>
+                <span id="charCount">Caracteres: 0</span>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // --- Referências aos Elementos do DOM ---
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const videoTitleInput = document.getElementById('videoTitle');
+        const characterSelect = document.getElementById('characterSelect');
+        const partsCountInput = document.getElementById('partsCount');
+        const generateButton = document.getElementById('generateButton');
+        const statusContainer = document.getElementById('statusContainer');
+        const statusText = document.getElementById('statusText');
+        const progressBar = document.getElementById('progressBar');
+        const scriptOutput = document.getElementById('scriptOutput');
+        const copyButton = document.getElementById('copyButton');
+        const downloadButton = document.getElementById('downloadButton');
+        const wordCountEl = document.getElementById('wordCount');
+        const charCountEl = document.getElementById('charCount');
+
+        // --- Variáveis de Estado ---
+        let isGenerating = false;
+        let fullScript = '';
+        
+        // --- Event Listeners ---
+        generateButton.addEventListener('click', handleGenerateScript);
+        copyButton.addEventListener('click', handleCopyScript);
+        downloadButton.addEventListener('click', handleDownloadScript);
+
+        function updateCounters() {
+            const text = scriptOutput.value;
+            const charCount = text.length;
+            const wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            wordCountEl.textContent = `Palavras: ${wordCount.toLocaleString('pt-BR')}`;
+            charCountEl.textContent = `Caracteres: ${charCount.toLocaleString('pt-BR')}`;
+        }
+        
+        // Função para obter o perfil detalhado do personagem selecionado
+        function getCharacterProfile(character) {
+            const profiles = {
+                dante_gebel: {
+                    name: "Pastor Dante Gebel",
+                    style: "Carismático, teatral y altamente emocional. Usa lenguaje accesible, humor, historias personales y ejemplos del cotidiano. Sus mensajes son motivacionales, a menudo con un enfoque psicológico, relacional y espiritual.",
+                    themes: "Fé en Dios en momentos difíciles, relaciones y familia, propósito de vida y autoconocimiento, críticas a la religiosidad vacía.",
+                    persona: "Terno elegante, cabelo penteado y presencia de palco marcante. Voz calma, pero intensa — transmite autoridad y empatía al mismo tiempo."
+                },
+                luis_toro: {
+                    name: "Padre Luis Toro",
+                    style: "Enérgico, directo y confrontador. Utiliza la Biblia como principal arma de defensa de la fé católica. Estilo apasionado, con énfasis en la doctrina católica tradicional.",
+                    themes: "Autoridad de la Iglesia Católica, la importancia de la Eucaristía y los sacramentos, la Virgen María, defensa de la Tradición Apostólica.",
+                    persona: "Usa batina preta y crucifixo no peito. Linguagem firme, gestos expressivos, olhar penetrante. Frases de impacto como: “Muéstrame en la Biblia”."
+                }
+            };
+            return profiles[character];
+        }
+
+        // Função para construir o prompt para cada parte
+        function buildCelebrityPromptForPart(partNumber, totalParts, title, characterProfile, previousScript) {
+            const baseInstructions = `
+                Eres un guionista experto en crear biografías e historias emocionantes sobre personalidades famosas para canales de YouTube. Tu estilo es el de un documental narrado, envolvente y que mantiene la atención del espectador.
+
+                **Tarea General:**
+                Crea un guion en ${totalParts} partes de aproximadamente 1000 palabras cada una para el título de video: "${title}". La historia debe girar en torno a ${characterProfile.name}.
+
+                **Instrucciones de Tono y Estilo:**
+                - Adopta el estilo de narración de ${characterProfile.name}. La narración debe sonar como si él mismo estuviera contando la historia o como si un biógrafo experto estuviera narrando, usando las siguientes características:
+                    - Estilo de Narración: ${characterProfile.style}
+                    - Temas Centrales: ${characterProfile.themes}
+                    - Persona Pública: ${characterProfile.persona}
+                - El idioma debe ser 100% Español de México.
+                - El guion debe ser un texto sólido, sin títulos, subtítulos ni notas de dirección. Solo el texto bruto para ser narrado por una IA.
+            `;
+
+            const middlePart = Math.ceil(totalParts / 2);
+            let taskDescription = "";
+
+            if (partNumber === 1) {
+                taskDescription = `**Tarea Específica para la Parte 1:**\nEsta es la introducción. Comienza con un gancho muy impactante y una apertura creativa que capture la atención del espectador de inmediato, relacionándolo directamente con el título "${title}". Luego, presenta el contexto inicial de la historia. **Incluye el primer gancho natural para que la gente comente.**`;
+            } else if (partNumber === middlePart) {
+                taskDescription = `**Tarea Específica para la Parte ${partNumber}:**\nEsta es la mitad de la historia. Continúa desarrollando el arco narrativo. **Incluye el segundo gancho natural para comentarios en esta parte.**\n\nContexto de la parte anterior para continuar:\n"...${previousScript.split(' ').slice(-200).join(' ')}"`;
+            } else if (partNumber === totalParts) {
+                taskDescription = `**Tarea Específica para la Parte Final (${partNumber}):**\nEsta es la conclusión. Ofrece un cierre poderoso y extenso para la historia, reflexionando sobre los eventos y dejando una impresión duradera en el espectador. **Incluye el tercer y último gancho para comentarios aquí.**\n\nContexto de la parte anterior para continuar:\n"...${previousScript.split(' ').slice(-200).join(' ')}"`;
+            } else {
+                taskDescription = `**Tarea Específica para la Parte ${partNumber}:**\nContinúa la historia desde donde la dejó la parte anterior, manteniendo el estilo y el tono definidos. No incluyas un gancho para comentarios en esta parte.\n\nContexto de la parte anterior para continuar:\n"...${previousScript.split(' ').slice(-200).join(' ')}"`;
+            }
+
+            return `${baseInstructions}\n\n${taskDescription}`;
+        }
+        
+        async function handleGenerateScript() {
+            if (isGenerating) return;
+
+            const title = videoTitleInput.value.trim();
+            const totalParts = parseInt(partsCountInput.value, 10);
+            const selectedCharacter = characterSelect.value;
+            
+            if (!title) {
+                alert('Por favor, insira um título para o vídeo.');
+                return;
+            }
+            if (isNaN(totalParts) || totalParts < 3) {
+                alert('O número de partes deve ser no mínimo 3.');
+                return;
+            }
+            
+            const characterProfile = getCharacterProfile(selectedCharacter);
+
+            isGenerating = true;
+            fullScript = '';
+            scriptOutput.value = '';
+            updateCounters();
+            updateUIState(true);
+
+            try {
+                for (let i = 1; i <= totalParts; i++) {
+                    statusText.textContent = `Gerando parte ${i} de ${totalParts} para a história de ${characterProfile.name}...`;
+                    
+                    const prompt = buildCelebrityPromptForPart(i, totalParts, title, characterProfile, fullScript);
+                    const newPart = await callGeminiAPI(prompt);
+
+                    fullScript += (fullScript ? '\n\n' : '') + newPart;
+                    scriptOutput.value = fullScript;
+                    scriptOutput.scrollTop = scriptOutput.scrollHeight;
+                    updateCounters();
+                    
+                    progressBar.style.width = `${(i / totalParts) * 100}%`;
+                }
+                statusText.textContent = 'Roteiro gerado com sucesso!';
+            } catch (error) {
+                console.error('Erro ao gerar o roteiro:', error);
+                statusText.textContent = `Erro: ${error.message}. Por favor, tente novamente.`;
+                scriptOutput.value += "\n\n--- GERAÇÃO INTERROMPIDA DEVIDO A UM ERRO ---";
+            } finally {
+                isGenerating = false;
+                updateUIState(false);
+            }
+        }
+        
+        async function callGeminiAPI(prompt) {
+            const userApiKey = apiKeyInput.value.trim();
+            const apiKey = userApiKey || ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            
+            const payload = {
+                contents: [{ role: "user", parts: [{ text: prompt }] }],
+                generationConfig: {
+                    temperature: 0.7,
+                    topP: 0.95,
+                    maxOutputTokens: 8192,
+                }
+            };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorBody = await response.json();
+                console.error("API Error:", errorBody);
+                let errorMessage = `Erro na API: ${response.statusText}`;
+                if (errorBody?.error?.message) { errorMessage = `Erro na API: ${errorBody.error.message}`; }
+                if (response.status === 400) { errorMessage = "Erro: A Chave da API parece ser inválida. Verifique a chave e tente novamente."; }
+                throw new Error(errorMessage);
+            }
+
+            const result = await response.json();
+            const candidate = result.candidates?.[0];
+
+            if (candidate?.content?.parts?.[0]?.text) {
+                return candidate.content.parts[0].text;
+            } else {
+                console.error("Resposta inesperada da API:", JSON.stringify(result, null, 2));
+                throw new Error('Não foi possível extrair o texto da resposta da API.');
+            }
+        }
+
+        function handleCopyScript() {
+            if (!scriptOutput.value) return;
+            try {
+                scriptOutput.select();
+                scriptOutput.setSelectionRange(0, 99999); 
+                document.execCommand('copy');
+                const originalText = copyButton.innerHTML;
+                copyButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Copiado!</span>`;
+                setTimeout(() => { copyButton.innerHTML = originalText; }, 2000);
+            } catch (err) {
+                console.error('Falha ao copiar: ', err);
+            }
+            window.getSelection()?.removeAllRanges();
+        }
+
+        function handleDownloadScript() {
+            if (isGenerating || !scriptOutput.value) return;
+            const title = videoTitleInput.value.trim().replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'roteiro_gerado';
+            const fileContent = `TÍTULO: ${videoTitleInput.value.trim()}\nPERSONAGEM: ${characterSelect.options[characterSelect.selectedIndex].text}\n\n---\n\n${scriptOutput.value}`;
+            const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${title}.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }
+        
+        function updateUIState(isLoading) {
+            generateButton.disabled = isLoading;
+            apiKeyInput.disabled = isLoading;
+            videoTitleInput.disabled = isLoading;
+            characterSelect.disabled = isLoading;
+            partsCountInput.disabled = isLoading;
+            downloadButton.disabled = isLoading || !scriptOutput.value;
+
+            if (isLoading) {
+                generateButton.classList.add('opacity-50', 'cursor-not-allowed');
+                statusContainer.classList.remove('hidden');
+                progressBar.style.width = '0%';
+            } else {
+                generateButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        updateCounters();
+        updateUIState(false);
+    </script>
+</body>
+</html>
