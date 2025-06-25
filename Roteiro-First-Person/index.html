@@ -142,7 +142,7 @@
          * Constrói o prompt para a API com base na parte atual da história.
          */
         function buildPromptForPart(partNumber, totalParts, title, previousScript) {
-            // PROMPT ATUALIZADO COM REGRA MAIS RÍGIDA
+            // PROMPT ATUALIZADO COM NOVA REGRA DE ABERTURA
             const baseInstructions = `
                 Analyze the following instructions to generate a part of a long story.
                 Your task is to write a script in American English.
@@ -163,10 +163,10 @@
             const middlePart = Math.ceil(totalParts / 2);
 
             if (partNumber === 1) {
-                return `${baseInstructions}\n\n**Current Task:**\nYou are writing **Part 1 of ${totalParts}**. This is the introduction. It must be around 1000 words.\nThe video title is: **"${title}"**.\nYour primary goal is to create a powerful introduction. After the hook, begin the flashback. **Crucially, you must include the FIRST of the three comment hooks naturally within this part.** Remember the Content Purity rule: only narration.`;
+                return `${baseInstructions}\n\n**Current Task:**\nYou are writing **Part 1 of ${totalParts}**. This is the introduction. It must be around 1000 words.\nThe video title is: **"${title}"**.\n**Opening Variety Mandate:** You are strictly forbidden from using generic or repetitive opening phrases like "Okay, here we go," or "So, let's talk about...". You must create a unique, creative, and powerful opening for every script. The first sentence must immediately hook the reader and be directly related to the story's core conflict. After the hook, begin the flashback. **Crucially, you must include the FIRST of the three comment hooks naturally within this part.** Remember the Content Purity rule: only narration.`;
             } else if (partNumber === middlePart) {
                  const context = previousScript.split(' ').slice(-200).join(' ');
-                 return `${baseInstructions}\n\n**Current Task:**\nYou are writing **Part ${partNumber} of ${totalParts}**. This is the middle of the story. It must be around 1000 words.\n**Crucially, you must include the SECOND of the three comment hooks naturally within this part.** Remember the Content Purity rule.\n\nHere is the end of the previous part to give you context:\n"...${context}"\n\nContinue the narrative from where it left off.`;
+                 return `${baseInstructions}\n\n**Current Task:**\nYou are writing **Part ${partNumber} of ${totalParts}**. This is the middle of the story. It must be around 1000 words.\n**Crucially, you must include the SECOND of the three comment hooks naturally within this part,** relating it to the current events of the narrative.\nRemember the Content Purity rule.\n\nHere is the end of the previous part to give you context:\n"...${context}"\n\nContinue the narrative from where it left off.`;
             } else if (partNumber === totalParts) {
                  const context = previousScript.split(' ').slice(-200).join(' ');
                  return `${baseInstructions}\n\n**Current Task:**\nYou are writing the **Final Part, ${partNumber} of ${totalParts}**. This is the conclusion. It must be around 1000 words.\nWrap up the story and resolve the main conflict. **Crucially, you must include the THIRD and FINAL comment hook naturally within this concluding part.** Remember the Content Purity rule.\n\nHere is the end of the previous part to give you context:\n"...${context}"\n\nContinue from there to write the final thoughts.`;
