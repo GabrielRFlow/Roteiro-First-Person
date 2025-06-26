@@ -109,35 +109,41 @@
             </div>
         </div>
         
-        <!-- SEÇÃO PROMPTS DE IMAGEM ATUALIZADA -->
+        <!-- SEÇÃO PROMPTS DE IMAGEM -->
         <div id="imagePromptSection" class="pt-4 space-y-4">
             <h3 class="text-xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Prompt para Imagem</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- Opção 1 -->
                 <div class="space-y-2">
                     <div class="flex justify-between items-center">
                         <label class="text-sm font-medium text-gray-400">Opção 1</label>
                         <button id="imagePromptBtn1" data-target="prompt1" class="image-prompt-btn bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-1 px-3 rounded-lg transition-colors text-xs">Gerar</button>
                     </div>
-                    <textarea id="prompt1" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-400 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" readonly placeholder="Clique em 'Gerar' para criar um prompt..."></textarea>
+                    <textarea id="prompt1" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-400 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" readonly placeholder="Clique em 'Gerar'..."></textarea>
                 </div>
-                <!-- Opção 2 -->
                 <div class="space-y-2">
                     <div class="flex justify-between items-center">
                         <label class="text-sm font-medium text-gray-400">Opção 2</label>
                         <button id="imagePromptBtn2" data-target="prompt2" class="image-prompt-btn bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-1 px-3 rounded-lg transition-colors text-xs">Gerar</button>
                     </div>
-                    <textarea id="prompt2" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-400 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" readonly placeholder="Clique em 'Gerar' para criar um prompt..."></textarea>
+                    <textarea id="prompt2" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-400 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" readonly placeholder="Clique em 'Gerar'..."></textarea>
                 </div>
-                <!-- Opção 3 -->
                 <div class="space-y-2">
                     <div class="flex justify-between items-center">
                         <label class="text-sm font-medium text-gray-400">Opção 3</label>
                         <button id="imagePromptBtn3" data-target="prompt3" class="image-prompt-btn bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-1 px-3 rounded-lg transition-colors text-xs">Gerar</button>
                     </div>
-                    <textarea id="prompt3" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-400 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" readonly placeholder="Clique em 'Gerar' para criar um prompt..."></textarea>
+                    <textarea id="prompt3" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-400 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" readonly placeholder="Clique em 'Gerar'..."></textarea>
                 </div>
             </div>
+        </div>
+
+        <!-- NOVA SEÇÃO: GERADOR DE FRASES PARA THUMBNAIL -->
+        <div id="thumbPhraseSection" class="pt-4 space-y-2">
+            <h3 class="text-xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Gerador de Frases para Thumb</h3>
+            <div class="flex justify-end">
+                 <button id="thumbPhraseBtn" class="bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-1 px-3 rounded-lg transition-colors text-xs">Gerar</button>
+            </div>
+            <textarea id="thumbPhraseOutput" rows="5" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-400 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" readonly placeholder="Clique em 'Gerar' para criar 10 frases de impacto..."></textarea>
         </div>
 
     </div>
@@ -158,6 +164,9 @@
         const wordCountEl = document.getElementById('wordCount');
         const charCountEl = document.getElementById('charCount');
         const imagePromptBtns = document.querySelectorAll('.image-prompt-btn');
+        // Referências da nova seção de frases de thumb
+        const thumbPhraseBtn = document.getElementById('thumbPhraseBtn');
+        const thumbPhraseOutput = document.getElementById('thumbPhraseOutput');
 
         // --- Variáveis de Estado ---
         let isGeneratingScript = false;
@@ -165,9 +174,10 @@
         
         // --- Event Listeners ---
         generateButton.addEventListener('click', handleGenerateScript);
-        copyButton.addEventListener('click', () => handleCopy(scriptOutput, copyButton));
+        copyButton.addEventListener('click', () => handleCopy(scriptOutput, copyButton, "Copiar"));
         downloadButton.addEventListener('click', handleDownloadScript);
         imagePromptBtns.forEach(btn => btn.addEventListener('click', handleImagePromptAction));
+        thumbPhraseBtn.addEventListener('click', handleThumbPhraseAction);
 
         function updateCounters() {
             const text = scriptOutput.value;
@@ -245,14 +255,13 @@
             }
         }
 
-        // FUNÇÃO ATUALIZADA PARA GERAR PROMPTS DE IMAGEM
         async function handleImagePromptAction(event) {
             const button = event.currentTarget;
             const targetId = button.dataset.target;
             const textarea = document.getElementById(targetId);
 
             if (button.textContent === 'Copiar' || button.textContent === 'Copiado!') {
-                handleCopy(textarea, button);
+                handleCopy(textarea, button, "Copiar");
                 return;
             }
 
@@ -265,7 +274,6 @@
             button.disabled = true;
             button.textContent = 'Gerando...';
 
-            // PROMPT DE IMAGEM ATUALIZADO E MAIS INTELIGENTE
             const imagePromptInstruction = `
                 Analyze the video title provided below. Your task is to generate a single, creative image prompt in English for an AI like Sora.
                 
@@ -285,7 +293,53 @@
             } catch (error) {
                 console.error("Erro ao gerar prompt de imagem:", error);
                 textarea.value = `Erro: ${error.message}`;
-                button.textContent = 'Gerar'; // Reseta o botão em caso de erro
+                button.textContent = 'Gerar';
+            } finally {
+                button.disabled = false;
+            }
+        }
+        
+        async function handleThumbPhraseAction(event) {
+            const button = event.currentTarget;
+            if (button.textContent === 'Copiar' || button.textContent === 'Copiado!') {
+                handleCopy(thumbPhraseOutput, button, "Copiar");
+                return;
+            }
+
+            const title = videoTitleInput.value.trim();
+            if (!title) {
+                alert('Por favor, insira um título para o vídeo antes de gerar as frases.');
+                return;
+            }
+
+            button.disabled = true;
+            button.textContent = 'Gerando...';
+            thumbPhraseOutput.value = '';
+
+            const thumbPhrasePrompt = `
+                Com base no seguinte título de vídeo:
+                👉 "${title}"
+                Gere 10 frases curtas e impactantes EM ESPANHOL - MÉXICO para a thumbnail. Elas devem seguir estas regras:
+
+                1. De 2 a 6 palavras no máximo.
+                2. Misture frases bem curtas (2–3 palavras) com algumas mais extensas (4–6 palavras).
+                3. Todas as frases devem ser altamente emocionais, provocativas ou dramáticas.
+                4. Use letras maiúsculas para dar ênfase (ejemplo: "LO PERDIÓ TODO").
+                5. Evite repetir palavras.
+                6. Sempre devem fazer sentido com o título e gerar curiosidade imediata.
+                7. Utilize verbos fortes, palavras de ação, surpresa ou conflito.
+                8. Use expressões comuns de impacto como: “SIN PALABRAS”, “EXPLOTÓ”, “LO ENFRENTÓ”, “ROMPE EN LLANTO”, “LO DEJÓ HELADO”, “NO LO ESPERABA”, “VERDAD OCULTA”. Não se limite a apenas isso.
+                9. Retorne apenas a lista de 10 frases, cada uma em uma nova linha. Não adicione nenhum outro texto, título ou introdução.
+            `;
+            
+            try {
+                const phrases = await callGeminiAPI(thumbPhrasePrompt);
+                thumbPhraseOutput.value = phrases;
+                button.textContent = 'Copiar';
+            } catch (error) {
+                console.error("Erro ao gerar frases para thumb:", error);
+                thumbPhraseOutput.value = `Erro ao gerar frases: ${error.message}`;
+                button.textContent = 'Gerar';
             } finally {
                 button.disabled = false;
             }
@@ -318,16 +372,15 @@
             }
         }
 
-        function handleCopy(textareaElement, buttonElement) {
+        function handleCopy(textareaElement, buttonElement, originalText) {
             if (!textareaElement.value) return;
             try {
                 textareaElement.select();
                 document.execCommand('copy');
-                const originalText = buttonElement.textContent;
+                const prevText = buttonElement.textContent;
                 buttonElement.textContent = 'Copiado!';
-                // Muda o texto de volta para 'Copiar' ou 'Gerar' dependendo do estado anterior
                 setTimeout(() => { 
-                    buttonElement.textContent = originalText.includes('Gerando') ? 'Copiar' : originalText;
+                    buttonElement.textContent = originalText || prevText;
                  }, 2000);
             } catch (err) {
                 console.error('Falha ao copiar: ', err);
@@ -349,7 +402,6 @@
             URL.revokeObjectURL(link.href);
         }
         
-        // FUNÇÃO ATUALIZADA PARA NÃO BLOQUEAR OS BOTÕES DE IMAGEM
         function updateUIState(isLoading) {
             generateButton.disabled = isLoading;
             apiKeyInput.disabled = isLoading;
@@ -358,15 +410,18 @@
             partsCountInput.disabled = isLoading;
             downloadButton.disabled = isLoading || !fullScript;
             
-            // Os botões de prompt de imagem NÃO são desabilitados aqui
-            // para permitir a geração independente.
-
             if (isLoading) {
                 generateButton.classList.add('opacity-50', 'cursor-not-allowed');
                 statusContainer.classList.remove('hidden');
                 progressBar.style.width = '0%';
+                // Desabilita botões auxiliares durante a geração principal
+                imagePromptBtns.forEach(btn => btn.disabled = true);
+                thumbPhraseBtn.disabled = true;
             } else {
                 generateButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                // Habilita botões auxiliares
+                imagePromptBtns.forEach(btn => btn.disabled = false);
+                thumbPhraseBtn.disabled = false;
             }
         }
 
