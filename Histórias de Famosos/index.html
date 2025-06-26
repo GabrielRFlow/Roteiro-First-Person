@@ -108,6 +108,38 @@
                 <span id="charCount">Caracteres: 0</span>
             </div>
         </div>
+        
+        <!-- SEÇÃO PROMPTS DE IMAGEM ATUALIZADA -->
+        <div id="imagePromptSection" class="pt-4 space-y-4">
+            <h3 class="text-xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Prompt para Imagem</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Opção 1 -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label class="text-sm font-medium text-gray-400">Opção 1</label>
+                        <button id="imagePromptBtn1" data-target="prompt1" class="image-prompt-btn bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-1 px-3 rounded-lg transition-colors text-xs">Gerar</button>
+                    </div>
+                    <textarea id="prompt1" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-400 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" readonly placeholder="Clique em 'Gerar' para criar um prompt..."></textarea>
+                </div>
+                <!-- Opção 2 -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label class="text-sm font-medium text-gray-400">Opção 2</label>
+                        <button id="imagePromptBtn2" data-target="prompt2" class="image-prompt-btn bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-1 px-3 rounded-lg transition-colors text-xs">Gerar</button>
+                    </div>
+                    <textarea id="prompt2" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-400 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" readonly placeholder="Clique em 'Gerar' para criar um prompt..."></textarea>
+                </div>
+                <!-- Opção 3 -->
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label class="text-sm font-medium text-gray-400">Opção 3</label>
+                        <button id="imagePromptBtn3" data-target="prompt3" class="image-prompt-btn bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-1 px-3 rounded-lg transition-colors text-xs">Gerar</button>
+                    </div>
+                    <textarea id="prompt3" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-400 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" readonly placeholder="Clique em 'Gerar' para criar um prompt..."></textarea>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script type="module">
@@ -125,15 +157,17 @@
         const downloadButton = document.getElementById('downloadButton');
         const wordCountEl = document.getElementById('wordCount');
         const charCountEl = document.getElementById('charCount');
+        const imagePromptBtns = document.querySelectorAll('.image-prompt-btn');
 
         // --- Variáveis de Estado ---
-        let isGenerating = false;
+        let isGeneratingScript = false;
         let fullScript = '';
         
         // --- Event Listeners ---
         generateButton.addEventListener('click', handleGenerateScript);
-        copyButton.addEventListener('click', handleCopyScript);
+        copyButton.addEventListener('click', () => handleCopy(scriptOutput, copyButton));
         downloadButton.addEventListener('click', handleDownloadScript);
+        imagePromptBtns.forEach(btn => btn.addEventListener('click', handleImagePromptAction));
 
         function updateCounters() {
             const text = scriptOutput.value;
@@ -143,77 +177,47 @@
             charCountEl.textContent = `Caracteres: ${charCount.toLocaleString('pt-BR')}`;
         }
         
-        // Função para obter o perfil detalhado do personagem selecionado
         function getCharacterProfile(character) {
             const profiles = {
-                dante_gebel: {
-                    name: "Pastor Dante Gebel",
-                    style: "Carismático, teatral y altamente emocional. Usa lenguaje accesible, humor, historias personales y ejemplos del cotidiano. Sus mensajes son motivacionales, a menudo con un enfoque psicológico, relacional y espiritual.",
-                    themes: "Fé en Dios en momentos difíciles, relaciones y familia, propósito de vida y autoconocimiento, críticas a la religiosidad vacía.",
-                    persona: "Terno elegante, cabelo penteado y presencia de palco marcante. Voz calma, pero intensa — transmite autoridad y empatía al mismo tiempo."
-                },
-                luis_toro: {
-                    name: "Padre Luis Toro",
-                    style: "Enérgico, directo y confrontador. Utiliza la Biblia como principal arma de defensa de la fé católica. Estilo apasionado, con énfasis en la doctrina católica tradicional.",
-                    themes: "Autoridad de la Iglesia Católica, la importancia de la Eucaristía y los sacramentos, la Virgen María, defensa de la Tradición Apostólica.",
-                    persona: "Usa batina preta y crucifixo no peito. Linguagem firme, gestos expressivos, olhar penetrante. Frases de impacto como: “Muéstrame en la Biblia”."
-                }
+                dante_gebel: { name: "Pastor Dante Gebel", style: "Carismático, teatral y altamente emocional. Usa lenguaje accesible, humor, historias personales y ejemplos del cotidiano. Sus mensajes son motivacionales, a menudo con un enfoque psicológico, relacional y espiritual.", themes: "Fé en Dios en momentos difíciles, relaciones y familia, propósito de vida y autoconocimiento, críticas a la religiosidad vacía.", persona: "Terno elegante, cabelo penteado y presencia de palco marcante. Voz calma, pero intensa — transmite autoridad y empatía al mismo tiempo." },
+                luis_toro: { name: "Padre Luis Toro", style: "Enérgico, directo y confrontador. Utiliza la Biblia como principal arma de defensa de la fé católica. Estilo apasionado, con énfasis en la doctrina católica tradicional.", themes: "Autoridad de la Iglesia Católica, la importancia de la Eucaristía y los sacramentos, la Virgen María, defensa de la Tradición Apostólica.", persona: "Usa batina preta y crucifixo no peito. Linguagem firme, gestos expressivos, olhar penetrante. Frases de impacto como: “Muéstrame en la Biblia”." }
             };
             return profiles[character];
         }
 
-        // Função para construir o prompt para cada parte
         function buildCelebrityPromptForPart(partNumber, totalParts, title, characterProfile, previousScript) {
             const baseInstructions = `
                 Eres un guionista experto en crear biografías e historias emocionantes sobre personalidades famosas para canales de YouTube. Tu estilo es el de un documental narrado, envolvente y que mantiene la atención del espectador.
-
                 **Tarea General:**
                 Crea un guion en ${totalParts} partes de aproximadamente 1000 palabras cada una para el título de video: "${title}". La historia debe girar en torno a ${characterProfile.name}.
-
                 **Instrucciones de Tono y Estilo:**
-                - Adopta el estilo de narración de ${characterProfile.name}. La narración debe sonar como si él mismo estuviera contando la historia o como si un biógrafo experto estuviera narrando, usando las siguientes características:
-                    - Estilo de Narración: ${characterProfile.style}
-                    - Temas Centrales: ${characterProfile.themes}
-                    - Persona Pública: ${characterProfile.persona}
+                - Adopta el estilo de narración de ${characterProfile.name}, usando las siguientes características: Estilo de Narración: ${characterProfile.style}; Temas Centrales: ${characterProfile.themes}; Persona Pública: ${characterProfile.persona}.
                 - El idioma debe ser 100% Español de México.
-                - El guion debe ser un texto sólido, sin títulos, subtítulos ni notas de dirección. Solo el texto bruto para ser narrado por una IA.
+                - **CRÍTICO: Pureza del Contenido:** Tu respuesta DEBE SER ÚNICAMENTE las palabras habladas por el narrador. NO incluyas comentarios entre paréntesis como "(pausa dramática)" o "(sonríe)", descripciones de acciones, escenarios, direcciones de cámara o cualquier texto que no sea parte de la narración directa. El guion debe ser absolutamente limpio y listo para una IA de narración.
             `;
-
             const middlePart = Math.ceil(totalParts / 2);
             let taskDescription = "";
-
             if (partNumber === 1) {
-                taskDescription = `**Tarea Específica para la Parte 1:**\nEsta es la introducción. Comienza con un gancho muy impactante y una apertura creativa que capture la atención del espectador de inmediato, relacionándolo directamente con el título "${title}". Luego, presenta el contexto inicial de la historia. **Incluye el primer gancho natural para que la gente comente.**`;
+                taskDescription = `**Tarea Específica para la Parte 1:**\nEsta es la introducción. Comienza con un gancho muy impactante y una apertura creativa. **Incluye el primer gancho natural para que la gente comente.** Recuerda la regla de Pureza del Contenido.`;
             } else if (partNumber === middlePart) {
-                taskDescription = `**Tarea Específica para la Parte ${partNumber}:**\nEsta es la mitad de la historia. Continúa desarrollando el arco narrativo. **Incluye el segundo gancho natural para comentarios en esta parte.**\n\nContexto de la parte anterior para continuar:\n"...${previousScript.split(' ').slice(-200).join(' ')}"`;
+                taskDescription = `**Tarea Específica para la Parte ${partNumber}:**\nEsta es la mitad de la historia. **Incluye el segundo gancho natural para comentarios en esta parte.**\n\nContexto anterior:\n"...${previousScript.split(' ').slice(-200).join(' ')}"`;
             } else if (partNumber === totalParts) {
-                taskDescription = `**Tarea Específica para la Parte Final (${partNumber}):**\nEsta es la conclusión. Ofrece un cierre poderoso y extenso para la historia, reflexionando sobre los eventos y dejando una impresión duradera en el espectador. **Incluye el tercer y último gancho para comentarios aquí.**\n\nContexto de la parte anterior para continuar:\n"...${previousScript.split(' ').slice(-200).join(' ')}"`;
+                taskDescription = `**Tarea Específica para la Parte Final (${partNumber}):**\nEsta es la conclusión. Ofrece un cierre poderoso y extenso. **Incluye el tercer y último gancho para comentarios aquí.**\n\nContexto anterior:\n"...${previousScript.split(' ').slice(-200).join(' ')}"`;
             } else {
-                taskDescription = `**Tarea Específica para la Parte ${partNumber}:**\nContinúa la historia desde donde la dejó la parte anterior, manteniendo el estilo y el tono definidos. No incluyas un gancho para comentarios en esta parte.\n\nContexto de la parte anterior para continuar:\n"...${previousScript.split(' ').slice(-200).join(' ')}"`;
+                taskDescription = `**Tarea Específica para la Parte ${partNumber}:**\nContinúa la historia. No incluyas un gancho para comentarios en esta parte.\n\nContexto anterior:\n"...${previousScript.split(' ').slice(-200).join(' ')}"`;
             }
-
             return `${baseInstructions}\n\n${taskDescription}`;
         }
         
         async function handleGenerateScript() {
-            if (isGenerating) return;
-
+            if (isGeneratingScript) return;
             const title = videoTitleInput.value.trim();
             const totalParts = parseInt(partsCountInput.value, 10);
-            const selectedCharacter = characterSelect.value;
-            
-            if (!title) {
-                alert('Por favor, insira um título para o vídeo.');
-                return;
-            }
-            if (isNaN(totalParts) || totalParts < 3) {
-                alert('O número de partes deve ser no mínimo 3.');
-                return;
-            }
-            
-            const characterProfile = getCharacterProfile(selectedCharacter);
+            if (!title) { alert('Por favor, insira um título para o vídeo.'); return; }
+            if (isNaN(totalParts) || totalParts < 3) { alert('O número de partes deve ser no mínimo 3.'); return; }
+            const characterProfile = getCharacterProfile(characterSelect.value);
 
-            isGenerating = true;
+            isGeneratingScript = true;
             fullScript = '';
             scriptOutput.value = '';
             updateCounters();
@@ -222,15 +226,12 @@
             try {
                 for (let i = 1; i <= totalParts; i++) {
                     statusText.textContent = `Gerando parte ${i} de ${totalParts} para a história de ${characterProfile.name}...`;
-                    
                     const prompt = buildCelebrityPromptForPart(i, totalParts, title, characterProfile, fullScript);
                     const newPart = await callGeminiAPI(prompt);
-
                     fullScript += (fullScript ? '\n\n' : '') + newPart;
                     scriptOutput.value = fullScript;
                     scriptOutput.scrollTop = scriptOutput.scrollHeight;
                     updateCounters();
-                    
                     progressBar.style.width = `${(i / totalParts) * 100}%`;
                 }
                 statusText.textContent = 'Roteiro gerado com sucesso!';
@@ -239,37 +240,70 @@
                 statusText.textContent = `Erro: ${error.message}. Por favor, tente novamente.`;
                 scriptOutput.value += "\n\n--- GERAÇÃO INTERROMPIDA DEVIDO A UM ERRO ---";
             } finally {
-                isGenerating = false;
+                isGeneratingScript = false;
                 updateUIState(false);
             }
         }
-        
+
+        // FUNÇÃO ATUALIZADA PARA GERAR PROMPTS DE IMAGEM
+        async function handleImagePromptAction(event) {
+            const button = event.currentTarget;
+            const targetId = button.dataset.target;
+            const textarea = document.getElementById(targetId);
+
+            if (button.textContent === 'Copiar' || button.textContent === 'Copiado!') {
+                handleCopy(textarea, button);
+                return;
+            }
+
+            const title = videoTitleInput.value.trim();
+            if (!title) {
+                alert('Por favor, insira um título para o vídeo antes de gerar um prompt de imagem.');
+                return;
+            }
+            
+            button.disabled = true;
+            button.textContent = 'Gerando...';
+
+            // PROMPT DE IMAGEM ATUALIZADO E MAIS INTELIGENTE
+            const imagePromptInstruction = `
+                Analyze the video title provided below. Your task is to generate a single, creative image prompt in English for an AI like Sora.
+                
+                **Instructions:**
+                1.  **Identify all characters** mentioned in the video title.
+                2.  **Create a scene:** Describe a scene that visually represents the core context or conflict of the title. This scene must include all identified characters.
+                3.  **Style:** The image must be ultra-realistic, natural, and look like a candid photograph taken on a modern cell phone in natural daylight.
+                4.  **Output:** Your response must be ONLY the prompt text itself, with no extra explanations, titles, or quotes.
+
+                **Video Title:** "${title}"
+            `;
+            
+            try {
+                const imagePrompt = await callGeminiAPI(imagePromptInstruction);
+                textarea.value = imagePrompt;
+                button.textContent = 'Copiar';
+            } catch (error) {
+                console.error("Erro ao gerar prompt de imagem:", error);
+                textarea.value = `Erro: ${error.message}`;
+                button.textContent = 'Gerar'; // Reseta o botão em caso de erro
+            } finally {
+                button.disabled = false;
+            }
+        }
+
         async function callGeminiAPI(prompt) {
             const userApiKey = apiKeyInput.value.trim();
             const apiKey = userApiKey || ""; 
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-            
-            const payload = {
-                contents: [{ role: "user", parts: [{ text: prompt }] }],
-                generationConfig: {
-                    temperature: 0.7,
-                    topP: 0.95,
-                    maxOutputTokens: 8192,
-                }
-            };
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig: { temperature: 0.7, topP: 0.95, maxOutputTokens: 8192 } };
 
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
 
             if (!response.ok) {
                 const errorBody = await response.json();
-                console.error("API Error:", errorBody);
                 let errorMessage = `Erro na API: ${response.statusText}`;
                 if (errorBody?.error?.message) { errorMessage = `Erro na API: ${errorBody.error.message}`; }
-                if (response.status === 400) { errorMessage = "Erro: A Chave da API parece ser inválida. Verifique a chave e tente novamente."; }
+                if (response.status === 400) { errorMessage = "Erro: A Chave da API parece ser inválida."; }
                 throw new Error(errorMessage);
             }
 
@@ -284,15 +318,17 @@
             }
         }
 
-        function handleCopyScript() {
-            if (!scriptOutput.value) return;
+        function handleCopy(textareaElement, buttonElement) {
+            if (!textareaElement.value) return;
             try {
-                scriptOutput.select();
-                scriptOutput.setSelectionRange(0, 99999); 
+                textareaElement.select();
                 document.execCommand('copy');
-                const originalText = copyButton.innerHTML;
-                copyButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check"><polyline points="20 6 9 17 4 12"></polyline></svg><span>Copiado!</span>`;
-                setTimeout(() => { copyButton.innerHTML = originalText; }, 2000);
+                const originalText = buttonElement.textContent;
+                buttonElement.textContent = 'Copiado!';
+                // Muda o texto de volta para 'Copiar' ou 'Gerar' dependendo do estado anterior
+                setTimeout(() => { 
+                    buttonElement.textContent = originalText.includes('Gerando') ? 'Copiar' : originalText;
+                 }, 2000);
             } catch (err) {
                 console.error('Falha ao copiar: ', err);
             }
@@ -300,9 +336,9 @@
         }
 
         function handleDownloadScript() {
-            if (isGenerating || !scriptOutput.value) return;
+            if (isGeneratingScript || !fullScript) return;
             const title = videoTitleInput.value.trim().replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'roteiro_gerado';
-            const fileContent = `TÍTULO: ${videoTitleInput.value.trim()}\nPERSONAGEM: ${characterSelect.options[characterSelect.selectedIndex].text}\n\n---\n\n${scriptOutput.value}`;
+            const fileContent = `TÍTULO: ${videoTitleInput.value.trim()}\nPERSONAGEM: ${characterSelect.options[characterSelect.selectedIndex].text}\n\n---\n\n${fullScript}`;
             const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -313,13 +349,17 @@
             URL.revokeObjectURL(link.href);
         }
         
+        // FUNÇÃO ATUALIZADA PARA NÃO BLOQUEAR OS BOTÕES DE IMAGEM
         function updateUIState(isLoading) {
             generateButton.disabled = isLoading;
             apiKeyInput.disabled = isLoading;
             videoTitleInput.disabled = isLoading;
             characterSelect.disabled = isLoading;
             partsCountInput.disabled = isLoading;
-            downloadButton.disabled = isLoading || !scriptOutput.value;
+            downloadButton.disabled = isLoading || !fullScript;
+            
+            // Os botões de prompt de imagem NÃO são desabilitados aqui
+            // para permitir a geração independente.
 
             if (isLoading) {
                 generateButton.classList.add('opacity-50', 'cursor-not-allowed');
