@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de Roteiros em Espanhol</title>
+    <title>Gerador de Roteiros em Espanhol (ChatGPT)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,7 +45,7 @@
         
         <!-- Cabeçalho em Português -->
         <div class="text-center">
-            <h1 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Gerador de Roteiros em Espanhol</h1>
+            <h1 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Gerador de Roteiros em Espanhol (ChatGPT)</h1>
             <h2 class="text-lg text-gray-400 mt-2">Historias en Primera Persona (en Español)</h2>
             <p class="text-xs text-gray-500 mt-1">APP BY: G2R DIGITAL CORPORATION LTDA</p>
             <p class="text-gray-400 mt-4">Insira o título, tome um café e veja seu roteiro ficar pronto em segundos...</p>
@@ -54,8 +54,8 @@
         <!-- Área de Input em Português -->
         <div class="space-y-4">
             <div class="space-y-2">
-                <label for="apiKeyInput" class="block text-sm font-medium text-gray-400">Chave da API (Obrigatório para uso externo)</label>
-                <input type="password" id="apiKeyInput" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" placeholder="Cole sua chave de API aqui para usar o app externamente">
+                <label for="apiKeyInput" class="block text-sm font-medium text-gray-400">Chave da API da OpenAI</label>
+                <input type="password" id="apiKeyInput" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" placeholder="Cole sua chave da API da OpenAI aqui (sk-...)">
             </div>
 
             <label for="videoTitle" class="block text-sm font-medium text-gray-400">TÍTULO DO VÍDEO (EM ESPANHOL)</label>
@@ -127,9 +127,6 @@
         copyButton.addEventListener('click', handleCopyScript);
         downloadButton.addEventListener('click', handleDownloadScript);
 
-        /**
-         * Atualiza os contadores de palavras e caracteres.
-         */
         function updateCounters() {
             const text = scriptOutput.value;
             const charCount = text.length;
@@ -138,11 +135,7 @@
             charCountEl.textContent = `Caracteres: ${charCount.toLocaleString('pt-BR')}`;
         }
 
-        /**
-         * Constrói o prompt para a API em Espanhol.
-         */
         function buildPromptForPart(partNumber, totalParts, title, previousScript) {
-            // PROMPT ADAPTADO PARA ESPAÑOL COM NOVAS DIRETIVAS
             const baseInstructions = `
                 Analiza las siguientes instrucciones para generar una parte de una historia larga.
                 Tu tarea es escribir un guion en Español de México.
@@ -163,7 +156,7 @@
             const middlePart = Math.ceil(totalParts / 2);
 
             if (partNumber === 1) {
-                return `${baseInstructions}\n\n**Tarea Actual:**\nEstás escribiendo la **Parte 1 de ${totalParts}**. Esta es la introducción. Debe tener alrededor de 1000 palabras.\nEl título del video es: **"${title}"**.\n**Introducción del Personaje Principal:** DEBES comenzar el guion presentando al personaje principal femenino. Dale un nombre único que sea contextualmente relevante al título del video y describe brevemente quién es ella. Esta introducción debe fluir directamente hacia el gancho principal de la historia.\n**Mandato de Variedad en la Apertura:** Tienes estrictamente prohibido usar frases de apertura genéricas. Las primeras frases deben ser poderosas, únicas para esta historia, y enganchar inmediatamente al lector en el conflicto central. Después de la introducción del personaje y el gancho, comienza el flashback. **Crucialmente, debes incluir el PRIMERO de los tres ganchos para comentarios de forma natural dentro de esta parte.** Recuerda la regla de Pureza del Contenido: solo narración.`;
+                return `${baseInstructions}\n\n**Tarea Actual:**\nEstás escribiendo la **Parte 1 de ${totalParts}**. Esta es la introducción. Debe tener alrededor de 1000 palabras.\nEl título del video es: **"${title}"**.\n**Mandato de Nombramiento e Introducción del Personaje:** DEBES comenzar el guion presentando al personaje principal femenino. Dale un nombre hispano (español/mexicano) único y creíble que sea relevante para el contexto del título. Evita usar siempre los mismos nombres o nombres muy parecidos (ej. Sofía, Valentina, etc.). Sé creativo con la elección del nombre en cada historia. Describe brevemente quién es este personaje recién nombrado.\n**Mandato de Variedad en la Apertura:** La introducción del personaje debe fluir hacia un gancho poderoso. Tienes estrictamente prohibido usar frases de apertura genéricas. Las primeras frases deben ser únicas para esta historia y enganchar inmediatamente al lector en el conflicto central. Después del gancho, comienza el flashback. **Crucialmente, debes incluir el PRIMERO de los tres ganchos para comentarios de forma natural dentro de esta parte.** Recuerda la regla de Pureza del Contenido: solo narración.`;
             } else if (partNumber === middlePart) {
                  const context = previousScript.split(' ').slice(-200).join(' ');
                  return `${baseInstructions}\n\n**Tarea Actual:**\nEstás escribiendo la **Parte ${partNumber} de ${totalParts}**. Esta es la mitad de la historia. Debe tener alrededor de 1000 palabras.\n**Crucialmente, debes incluir el SEGUNDO de los tres ganchos para comentarios de forma natural dentro de esta parte,** relacionándolo con los eventos actuales de la narrativa.\nRecuerda la regla de Pureza del Contenido.\n\nAquí está el final de la parte anterior para darte contexto:\n"...${context}"\n\nContinúa la narrativa desde donde se quedó.`;
@@ -176,9 +169,6 @@
             }
         }
         
-        /**
-         * Função principal para lidar com a geração do roteiro.
-         */
         async function handleGenerateScript() {
             if (isGenerating) return;
             
@@ -205,7 +195,7 @@
                     statusText.textContent = `Gerando Parte ${i} de ${totalParts}... (Isso pode levar um momento)`;
                     
                     const prompt = buildPromptForPart(i, totalParts, title, fullScript);
-                    const newPart = await callGeminiAPI(prompt);
+                    const newPart = await callChatGPTAPI(prompt); // MUDANÇA AQUI
 
                     fullScript += (fullScript ? '\n\n' : '') + newPart;
                     scriptOutput.value = fullScript;
@@ -227,55 +217,58 @@
         }
         
         /**
-         * Chama a API para gerar texto.
+         * NOVA FUNÇÃO PARA CHAMAR A API DO CHATGPT (OPENAI)
          */
-        async function callGeminiAPI(prompt) {
+        async function callChatGPTAPI(prompt) {
             const userApiKey = apiKeyInput.value.trim();
-            const apiKey = userApiKey || ""; 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            if (!userApiKey) {
+                throw new Error("A Chave da API da OpenAI é obrigatória e não foi fornecida.");
+            }
+
+            const apiUrl = 'https://api.openai.com/v1/chat/completions';
             
             const payload = {
-                contents: [{ role: "user", parts: [{ text: prompt }] }],
-                generationConfig: {
-                    temperature: 0.7,
-                    topP: 0.95,
-                    maxOutputTokens: 8192,
-                }
+                model: "gpt-4o-mini", // Modelo recomendado: eficiente e de alta qualidade
+                messages: [
+                    {
+                        "role": "system",
+                        "content": "You are a creative scriptwriter specialized in writing long, engaging, first-person narrative stories in Mexican Spanish for social media videos."
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                temperature: 0.75,
+                top_p: 0.95,
             };
 
             const response = await fetch(apiUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${userApiKey}`
+                },
                 body: JSON.stringify(payload)
             });
 
             if (!response.ok) {
                 const errorBody = await response.json();
                 console.error("API Error:", errorBody);
-                let errorMessage = `Erro na API: ${response.statusText}`;
-                if (errorBody?.error?.message) {
-                    errorMessage = `Erro na API: ${errorBody.error.message}`;
-                }
-                if (response.status === 400) {
-                    errorMessage = "Erro: A Chave da API parece ser inválida. Verifique a chave e tente novamente.";
-                }
-                throw new Error(errorMessage);
+                throw new Error(`Erro na API do ChatGPT: ${errorBody.error.message}`);
             }
 
             const result = await response.json();
-            const candidate = result.candidates?.[0];
 
-            if (candidate?.content?.parts?.[0]?.text) {
-                return candidate.content.parts[0].text;
+            if (result.choices && result.choices[0]) {
+                return result.choices[0].message.content;
             } else {
-                console.error("Resposta inesperada ou incompleta da API:", JSON.stringify(result, null, 2));
-                throw new Error('Não foi possível extrair o texto da resposta da API.');
+                console.error("Resposta inesperada da API do ChatGPT:", result);
+                throw new Error('Não foi possível extrair o texto da resposta da API do ChatGPT.');
             }
         }
 
-        /**
-         * Lida com a cópia do roteiro.
-         */
         function handleCopyScript() {
             if (!scriptOutput.value) return;
             try {
@@ -294,9 +287,6 @@
             window.getSelection()?.removeAllRanges();
         }
 
-        /**
-         * Lida com o download do roteiro.
-         */
         function handleDownloadScript() {
             if (isGenerating || !fullScript) return;
 
@@ -315,9 +305,6 @@
             URL.revokeObjectURL(link.href);
         }
         
-        /**
-         * Atualiza o estado da UI.
-         */
         function updateUIState(isLoading) {
             generateButton.disabled = isLoading;
             videoTitleInput.disabled = isLoading;
