@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de Roteiros (ChatGPT)</title>
+    <title>Gerador de Roteiros com IA (ChatGPT)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -45,7 +45,7 @@
         
         <!-- Cabeçalho -->
         <div class="text-center">
-            <h1 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Gerador de Roteiros (ChatGPT)</h1>
+            <h1 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Gerador de Roteiros Longos (ChatGPT)</h1>
             <h2 class="text-lg text-gray-400 mt-2">Histórias em Primeira Pessoa</h2>
             <p class="text-xs text-gray-500 mt-1">APP BY: G2R DIGITAL CORPORATION LTDA</p>
             <p class="text-gray-400 mt-4">Insira o título, tome um café e veja seu roteiro ficar pronto em alguns segundos...</p>
@@ -63,7 +63,7 @@
             
             <div class="space-y-2">
                 <label for="partsCount" class="block text-sm font-medium text-gray-400">Quantas partes você deseja? (mínimo 3)</label>
-                <input type="number" id="partsCount" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" value="16" min="3">
+                <input type="number" id="partsCount" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" value="10" min="3">
             </div>
 
             <button id="generateButton" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center space-x-2 btn-premium">
@@ -156,7 +156,7 @@
             const middlePart = Math.ceil(totalParts / 2);
 
             if (partNumber === 1) {
-                return `${baseInstructions}\n\n**Current Task:**\nYou are writing **Part 1 of ${totalParts}**. This is the introduction. It must be around 1000 words.\nThe video title is: **"${title}"**.\n**Main Character Introduction:** You MUST start the script by introducing the female main character. Give her a unique name that is contextually relevant to the video title, and briefly describe who she is. This introduction should flow directly into the main story hook.\n**Opening Variety Mandate:** You are strictly forbidden from using generic opening phrases. The first sentences must be powerful, unique to this story, and immediately hook the reader into the core conflict. After the character introduction and hook, begin the flashback. **Crucially, you must include the FIRST of the three comment hooks naturally within this part.** Remember the Content Purity rule: only narration.`;
+                return `${baseInstructions}\n\n**Current Task:**\nYou are writing **Part 1 of ${totalParts}**. This is the introduction. It must be around 1000 words.\nThe video title is: **"${title}"**.\n**Character Naming Mandate:** You MUST give the female main character a common, but not overly-used, American name. Be creative and choose a different, believable name for every new story. Avoid repetitive or very similar names like Elena, Eleanor, Claire, Evelyn, etc.\n**Main Character Introduction:** You MUST start the script by introducing this newly named female main character. Briefly describe who she is in a way that is contextually relevant to the video title. This introduction should flow directly into the main story hook.\n**Opening Variety Mandate:** You are strictly forbidden from using generic opening phrases. The first sentences must be powerful, unique to this story, and immediately hook the reader into the core conflict. After the character introduction and hook, begin the flashback. **Crucially, you must include the FIRST of the three comment hooks naturally within this part.** Remember the Content Purity rule: only narration.`;
             } else if (partNumber === middlePart) {
                  const context = previousScript.split(' ').slice(-200).join(' ');
                  return `${baseInstructions}\n\n**Current Task:**\nYou are writing **Part ${partNumber} of ${totalParts}**. This is the middle of the story. It must be around 1000 words.\n**Crucially, you must include the SECOND of the three comment hooks naturally within this part,** relating it to the current events of the narrative.\nRemember the Content Purity rule.\n\nHere is the end of the previous part to give you context:\n"...${context}"\n\nContinue the narrative from where it left off.`;
@@ -195,7 +195,6 @@
                     statusText.textContent = `Gerando Parte ${i} de ${totalParts}... (Isso pode levar um momento)`;
                     
                     const prompt = buildPromptForPart(i, totalParts, title, fullScript);
-                    // MUDANÇA: Chamando a função da API do ChatGPT
                     const newPart = await callChatGPTAPI(prompt);
 
                     fullScript += (fullScript ? '\n\n' : '') + newPart;
@@ -217,9 +216,6 @@
             }
         }
         
-        /**
-         * NOVA FUNÇÃO PARA CHAMAR A API DO CHATGPT (OPENAI)
-         */
         async function callChatGPTAPI(prompt) {
             const userApiKey = apiKeyInput.value.trim();
 
@@ -230,7 +226,7 @@
             const apiUrl = 'https://api.openai.com/v1/chat/completions';
             
             const payload = {
-                model: "gpt-4o-mini", // Modelo recomendado: eficiente e de alta qualidade
+                model: "gpt-4o-mini",
                 messages: [
                     {
                         "role": "system",
@@ -290,12 +286,16 @@
 
         function handleDownloadScript() {
             if (isGenerating || !fullScript) return;
+
             const title = videoTitleInput.value.trim().replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'roteiro_gerado';
             const fileContent = `TÍTULO DO VÍDEO: ${videoTitleInput.value.trim()}\n\n---\n\n${fullScript}`;
+            
             const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
+
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.download = `${title}.txt`;
+            
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
