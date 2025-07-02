@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roteiros - Primeira Pessoa (Alemão - ChatGPT)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020617; 
+        }
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background-color: #374151;
+            border-radius: 4px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background-color: #4b5563;
+        }
+        .btn-premium {
+            transition: all 0.3s ease;
+        }
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4), 0 0 25px rgba(139, 92, 246, 0.3);
+        }
+        .main-panel-border {
+             border: 1px solid transparent;
+             background: linear-gradient(#111827, #111827) padding-box, linear-gradient(145deg, #3b82f6, #a855f7) border-box;
+        }
+    </style>
+</head>
+<body class="text-gray-300 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-4xl bg-gray-900 rounded-2xl shadow-2xl shadow-black/50 p-6 md:p-8 space-y-6 main-panel-border">
+        
+        <!-- Cabeçalho -->
+        <div class="text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Gerador de Roteiros (Alemão)</h1>
+            <h2 class="text-lg text-gray-400 mt-2">Histórias em Primeira Pessoa</h2>
+            <p class="text-xs text-gray-500 mt-1">APP BY: G2R DIGITAL CORPORATION LTDA</p>
+            <p class="text-gray-400 mt-4">Insira o título, tome um café e veja seu roteiro ficar pronto em alguns segundos...</p>
+        </div>
+
+        <!-- Área de Input -->
+        <div class="space-y-4">
+            <div class="space-y-2">
+                <label for="apiKeyInput" class="block text-sm font-medium text-gray-400">Chave da API da OpenAI</label>
+                <input type="password" id="apiKeyInput" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" placeholder="Cole sua chave da API da OpenAI aqui (sk-...)">
+            </div>
+
+            <label for="videoTitle" class="block text-sm font-medium text-gray-400">TÍTULO DO VÍDEO (EM ALEMÃO)</label>
+            <input type="text" id="videoTitle" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" placeholder="Ex: Meine Eltern verkauften mein Haus, während ich im Urlaub war...">
+            
+            <div class="space-y-2">
+                <label for="partsCount" class="block text-sm font-medium text-gray-400">Quantas partes você deseja? (mínimo 3)</label>
+                <input type="number" id="partsCount" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" value="10" min="3">
+            </div>
+
+            <button id="generateButton" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center space-x-2 btn-premium">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-play-circle"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+                <span>Gerar Roteiro</span>
+            </button>
+        </div>
+
+        <!-- Status e Progresso -->
+        <div id="statusContainer" class="hidden space-y-2 pt-2">
+             <p id="statusText" class="text-center text-blue-400"></p>
+             <div class="w-full bg-gray-700 rounded-full h-2.5">
+                <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-purple-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Área de Output -->
+        <div class="space-y-2">
+            <div class="flex justify-between items-center">
+                <label for="scriptOutput" class="block text-sm font-medium text-gray-400">Roteiro Gerado (em Alemão):</label>
+                <div class="flex space-x-2">
+                    <button id="copyButton" class="bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-2 px-4 rounded-lg transition-colors text-sm flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        <span>Copiar</span>
+                    </button>
+                    <button id="downloadButton" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span>Baixar</span>
+                    </button>
+                </div>
+            </div>
+            <textarea id="scriptOutput" rows="15" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-3 text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none resize-none" readonly placeholder="O roteiro em alemão aparecerá aqui..."></textarea>
+            <div id="countersContainer" class="text-right text-sm text-gray-500 space-x-4 pr-2">
+                <span id="wordCount">Palavras: 0</span>
+                <span id="charCount">Caracteres: 0</span>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // --- Referências aos Elementos do DOM ---
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const videoTitleInput = document.getElementById('videoTitle');
+        const partsCountInput = document.getElementById('partsCount');
+        const generateButton = document.getElementById('generateButton');
+        const statusContainer = document.getElementById('statusContainer');
+        const statusText = document.getElementById('statusText');
+        const progressBar = document.getElementById('progressBar');
+        const scriptOutput = document.getElementById('scriptOutput');
+        const copyButton = document.getElementById('copyButton');
+        const downloadButton = document.getElementById('downloadButton');
+        const wordCountEl = document.getElementById('wordCount');
+        const charCountEl = document.getElementById('charCount');
+
+        // --- Variáveis de Estado ---
+        let isGenerating = false;
+        let fullScript = '';
+        
+        // --- Event Listeners ---
+        generateButton.addEventListener('click', handleGenerateScript);
+        copyButton.addEventListener('click', handleCopyScript);
+        downloadButton.addEventListener('click', handleDownloadScript);
+
+        function updateCounters() {
+            const text = scriptOutput.value;
+            const charCount = text.length;
+            const wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            wordCountEl.textContent = `Palavras: ${wordCount.toLocaleString('pt-BR')}`;
+            charCountEl.textContent = `Caracteres: ${charCount.toLocaleString('pt-BR')}`;
+        }
+
+        // PROMPT ADAPTADO PARA GERAR ROTEIRO EM ALEMÃO
+        function buildPromptForPart(partNumber, totalParts, title, previousScript) {
+            const baseInstructions = `
+                You are a creative scriptwriter. Your task is to write a script in Standard German based on the following instructions.
+
+                **Core Narrative Instructions:**
+                - **Total Length:** ${totalParts} parts of ~1000 words each.
+                - **Point of View:** First-person narrator (always female).
+                - **Language:** 100% Standard German (Hochdeutsch).
+                - **Style:** Documentary-style, first-person storytelling. The tone must be personal, relatable, and authentic.
+                - **Comment Hooks:** You MUST include exactly THREE natural-sounding questions for the audience to comment on throughout the entire script. Place one in the first part, one in the middle part, and one in the final part. Example: "Was hättet ihr an meiner Stelle getan? Lasst es mich in den Kommentaren wissen."
+                - **Structure:**
+                    1. The FIRST part must be a powerful introduction with a strong hook.
+                    2. The LAST part must be an extensive and satisfying conclusion.
+                - **Format:** The output must be a single, continuous block of text. No chapter titles, no breaks.
+                - **CRITICAL: Content Purity:** Your response MUST BE ONLY the spoken words of the narrator. Do NOT include any parenthetical remarks, action descriptions (like "(lächelt)"), scene settings, camera directions, or any text that is not part of the direct narration. The output must be a clean script ready for a text-to-speech engine.
+            `;
+            
+            const middlePart = Math.ceil(totalParts / 2);
+
+            if (partNumber === 1) {
+                return `${baseInstructions}\n\n**Current Task:**\nYou are writing **Part 1 of ${totalParts}**. This is the introduction. It must be around 1000 words.\nThe video title is: **"${title}"**.\n**Character Naming Mandate:** You MUST give the female main character a common, but not overly-used, German name (e.g., Lena, Sophie, Leonie, but be creative). It is critical that every single script has a different protagonist name. Be creative and actively avoid repeating names you may have used in previous generations. Do not use very similar sounding names either.\n**Main Character Introduction:** You MUST start the script by introducing this newly named female main character. Briefly describe who she is in a way that is contextually relevant to the video title. This introduction should flow directly into the main story hook.\n**Opening Variety Mandate:** You are strictly forbidden from using generic opening phrases. The first sentences must be powerful, unique to this story, and immediately hook the reader into the core conflict. After the character introduction and hook, begin the flashback. **Crucially, you must include the FIRST of the three comment hooks naturally within this part.** Remember the Content Purity rule: only narration.`;
+            } else if (partNumber === middlePart) {
+                 const context = previousScript.split(' ').slice(-200).join(' ');
+                 return `${baseInstructions}\n\n**Current Task:**\nYou are writing **Part ${partNumber} of ${totalParts}**. This is the middle of the story. It must be around 1000 words.\n**Crucially, you must include the SECOND of the three comment hooks naturally within this part,** relating it to the current events of the narrative.\nRemember the Content Purity rule.\n\nHere is the end of the previous part to give you context:\n"...${context}"\n\nContinue the narrative from where it left off.`;
+            } else if (partNumber === totalParts) {
+                 const context = previousScript.split(' ').slice(-200).join(' ');
+                 return `${baseInstructions}\n\n**Current Task:**\nYou are writing the **Final Part, ${partNumber} of ${totalParts}**. This is the conclusion. It must be around 1000 words.\nWrap up the story and resolve the main conflict. **Crucially, you must include the THIRD and FINAL comment hook naturally within this concluding part.** Remember the Content Purity rule.\n\nHere is the end of the previous part to give you context:\n"...${context}"\n\nContinue from there to write the final thoughts.`;
+            } else {
+                const context = previousScript.split(' ').slice(-200).join(' ');
+                return `${baseInstructions}\n\n**Current Task:**\nYou are continuing the story. You must write **Part ${partNumber} of ${totalParts}**. It must be around 1000 words. Do NOT include a comment hook in this part.\nThe video title is: **"${title}"**.\nRemember the Content Purity rule: only narration.\n\nHere is the end of the previous part to give you context:\n"...${context}"\n\nContinue the narrative from exactly where it left off.`;
+            }
+        }
+        
+        async function handleGenerateScript() {
+            if (isGenerating) return;
+            
+            const title = videoTitleInput.value.trim();
+            const totalParts = parseInt(partsCountInput.value, 10);
+
+            if (!title) {
+                alert('Por favor, insira um título para o vídeo.');
+                return;
+            }
+            if (isNaN(totalParts) || totalParts < 3) {
+                alert('O número de partes deve ser no mínimo 3.');
+                return;
+            }
+
+            isGenerating = true;
+            fullScript = '';
+            scriptOutput.value = '';
+            updateCounters();
+            updateUIState(true);
+
+            try {
+                for (let i = 1; i <= totalParts; i++) {
+                    statusText.textContent = `Gerando Parte ${i} de ${totalParts}... (Isso pode levar um momento)`;
+                    
+                    const prompt = buildPromptForPart(i, totalParts, title, fullScript);
+                    const newPart = await callChatGPTAPI(prompt);
+
+                    fullScript += (fullScript ? '\n\n' : '') + newPart;
+                    scriptOutput.value = fullScript;
+                    scriptOutput.scrollTop = scriptOutput.scrollHeight;
+                    updateCounters();
+                    
+                    const progressPercentage = (i / totalParts) * 100;
+                    progressBar.style.width = `${progressPercentage}%`;
+                }
+                statusText.textContent = 'Roteiro gerado com sucesso!';
+            } catch (error) {
+                console.error('Erro ao gerar o roteiro:', error);
+                statusText.textContent = `Erro: ${error.message}. Por favor, tente novamente.`;
+                scriptOutput.value += "\n\n--- GERAÇÃO INTERROMPIDA DEVIDO A UM ERRO ---";
+            } finally {
+                isGenerating = false;
+                updateUIState(false);
+            }
+        }
+        
+        async function callChatGPTAPI(prompt) {
+            const userApiKey = apiKeyInput.value.trim();
+
+            if (!userApiKey) {
+                throw new Error("A Chave da API da OpenAI é obrigatória e não foi fornecida.");
+            }
+
+            const apiUrl = 'https://api.openai.com/v1/chat/completions';
+            
+            const payload = {
+                model: "gpt-4o-mini",
+                messages: [
+                    {
+                        "role": "system",
+                        "content": "You are a creative scriptwriter specialized in writing long, engaging, first-person narrative stories in Standard German for social media videos."
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                temperature: 0.75,
+                top_p: 0.95,
+            };
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${userApiKey}`
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorBody = await response.json();
+                console.error("API Error:", errorBody);
+                throw new Error(`Erro na API do ChatGPT: ${errorBody.error.message}`);
+            }
+
+            const result = await response.json();
+
+            if (result.choices && result.choices[0]) {
+                return result.choices[0].message.content;
+            } else {
+                console.error("Resposta inesperada da API do ChatGPT:", result);
+                throw new Error('Não foi possível extrair o texto da resposta da API do ChatGPT.');
+            }
+        }
+
+        function handleCopyScript() {
+            if (!scriptOutput.value) return;
+            try {
+                scriptOutput.select();
+                scriptOutput.setSelectionRange(0, 99999); 
+                document.execCommand('copy');
+                const originalText = copyButton.innerHTML;
+                copyButton.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Copiado!</span>
+                `;
+                setTimeout(() => { copyButton.innerHTML = originalText; }, 2000);
+            } catch (err) {
+                console.error('Falha ao copiar: ', err);
+            }
+            window.getSelection()?.removeAllRanges();
+        }
+
+        function handleDownloadScript() {
+            if (isGenerating || !fullScript) return;
+
+            const title = videoTitleInput.value.trim().replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'skript_generiert';
+            const fileContent = `TITEL DES VIDEOS: ${videoTitleInput.value.trim()}\n\n---\n\n${fullScript}`;
+            
+            const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
+
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${title}.txt`;
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }
+        
+        function updateUIState(isLoading) {
+            generateButton.disabled = isLoading;
+            videoTitleInput.disabled = isLoading;
+            apiKeyInput.disabled = isLoading;
+            partsCountInput.disabled = isLoading;
+            downloadButton.disabled = isLoading || !fullScript;
+
+            if (isLoading) {
+                generateButton.classList.add('opacity-50', 'cursor-not-allowed');
+                statusContainer.classList.remove('hidden');
+                progressBar.style.width = '0%';
+            } else {
+                generateButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        updateCounters();
+        updateUIState(false);
+    </script>
+</body>
+</html>
