@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roteiros - Velho Oeste (Espanhol)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #020617; 
+        }
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background-color: #374151;
+            border-radius: 4px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background-color: #4b5563;
+        }
+        .btn-premium {
+            transition: all 0.3s ease;
+        }
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4), 0 0 25px rgba(139, 92, 246, 0.3);
+        }
+        .main-panel-border {
+             border: 1px solid transparent;
+             background: linear-gradient(#111827, #111827) padding-box, linear-gradient(145deg, #3b82f6, #a855f7) border-box;
+        }
+    </style>
+</head>
+<body class="text-gray-300 flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-4xl bg-gray-900 rounded-2xl shadow-2xl shadow-black/50 p-6 md:p-8 space-y-6 main-panel-border">
+        
+        <!-- Cabeçalho -->
+        <div class="text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Roteiros - Velho Oeste (Espanhol)</h1>
+            <p class="text-xs text-gray-500 mt-1">APP BY: G2R DIGITAL CORPORATION LTDA</p>
+            <p class="text-gray-400 mt-4">Insira o título e deixe a lenda ganhar vida...</p>
+        </div>
+
+        <!-- Área de Input -->
+        <div class="space-y-4">
+            <div class="space-y-2">
+                <label for="apiKeyInput" class="block text-sm font-medium text-gray-400">Chave da API da OpenAI</label>
+                <input type="password" id="apiKeyInput" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" placeholder="Cole sua chave da API da OpenAI aqui (sk-...)">
+            </div>
+
+            <label for="videoTitle" class="block text-sm font-medium text-gray-400">Título do Vídeo (em Espanhol)</label>
+            <input type="text" id="videoTitle" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" placeholder="Ex: El día que 200 guerreros comanches aparecieron en su granero...">
+            
+            <div class="space-y-2">
+                <label for="partsCount" class="block text-sm font-medium text-gray-400">Quantas partes você deseja? (mínimo 3)</label>
+                <input type="number" id="partsCount" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" value="6" min="3">
+            </div>
+
+            <button id="generateButton" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center space-x-2 btn-premium">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-play-circle"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
+                <span>Gerar Roteiro</span>
+            </button>
+        </div>
+
+        <!-- Status e Progresso -->
+        <div id="statusContainer" class="hidden space-y-2 pt-2">
+             <p id="statusText" class="text-center text-blue-400"></p>
+             <div class="w-full bg-gray-700 rounded-full h-2.5">
+                <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-purple-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <!-- Área de Output -->
+        <div class="space-y-2">
+            <div class="flex justify-between items-center">
+                <label for="scriptOutput" class="block text-sm font-medium text-gray-400">Roteiro Gerado (em Espanhol):</label>
+                <div class="flex space-x-2">
+                    <button id="copyButton" class="bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-2 px-4 rounded-lg transition-colors text-sm flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        <span>Copiar</span>
+                    </button>
+                    <button id="downloadButton" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-download"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span>Baixar</span>
+                    </button>
+                </div>
+            </div>
+            <textarea id="scriptOutput" rows="15" class="w-full bg-gray-950 border border-gray-700 rounded-lg px-4 py-3 text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none resize-none" readonly placeholder="La leyenda del Lejano Oeste aparecerá aquí..."></textarea>
+            <div id="countersContainer" class="text-right text-sm text-gray-500 space-x-4 pr-2">
+                <span id="wordCount">Palavras: 0</span>
+                <span id="charCount">Caracteres: 0</span>
+            </div>
+        </div>
+
+        <!-- SEÇÃO PROMPTS DE IMAGEM -->
+        <div id="imagePromptSection" class="pt-4 space-y-4">
+            <h3 class="text-xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Prompt para Imagem</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-400">Opção 1 (com Seta)</label>
+                    <div class="flex items-center space-x-2">
+                        <textarea id="prompt1" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-400 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" readonly placeholder="Clique em 'Gerar'..."></textarea>
+                        <div class="flex flex-col space-y-2">
+                            <button data-target="prompt1" data-arrow="true" class="image-prompt-btn bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold p-2 rounded-lg transition-colors text-xs">Gerar</button>
+                            <button data-target="prompt1" class="copy-prompt-btn hidden bg-blue-600 hover:bg-blue-500 p-2 rounded-lg transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 7a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.5-.5z"/></svg></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-400">Opção 2 (sem Seta)</label>
+                    <div class="flex items-center space-x-2">
+                        <textarea id="prompt2" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-400 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" readonly placeholder="Clique em 'Gerar'..."></textarea>
+                        <div class="flex flex-col space-y-2">
+                           <button data-target="prompt2" data-arrow="false" class="image-prompt-btn bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold p-2 rounded-lg transition-colors text-xs">Gerar</button>
+                           <button data-target="prompt2" class="copy-prompt-btn hidden bg-blue-600 hover:bg-blue-500 p-2 rounded-lg transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 7a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.5-.5z"/></svg></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        // --- Referências aos Elementos do DOM ---
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const videoTitleInput = document.getElementById('videoTitle');
+        const partsCountInput = document.getElementById('partsCount');
+        const generateButton = document.getElementById('generateButton');
+        const statusContainer = document.getElementById('statusContainer');
+        const statusText = document.getElementById('statusText');
+        const progressBar = document.getElementById('progressBar');
+        const scriptOutput = document.getElementById('scriptOutput');
+        const copyButton = document.getElementById('copyButton');
+        const downloadButton = document.getElementById('downloadButton');
+        const wordCountEl = document.getElementById('wordCount');
+        const charCountEl = document.getElementById('charCount');
+        const imagePromptBtns = document.querySelectorAll('.image-prompt-btn');
+
+        // --- Variáveis de Estado ---
+        let isGeneratingScript = false;
+        let fullScript = '';
+        
+        // --- Event Listeners ---
+        generateButton.addEventListener('click', handleGenerateScript);
+        copyButton.addEventListener('click', () => handleCopy(scriptOutput, copyButton));
+        downloadButton.addEventListener('click', handleDownloadScript);
+        imagePromptBtns.forEach(btn => {
+            const targetId = btn.dataset.target;
+            const copyBtn = btn.parentElement.querySelector('.copy-prompt-btn');
+            btn.addEventListener('click', () => handleImagePromptAction(btn, copyBtn, targetId));
+            copyBtn.addEventListener('click', () => handleCopy(document.getElementById(targetId), copyBtn));
+        });
+
+        function updateCounters() {
+            const text = scriptOutput.value;
+            const charCount = text.length;
+            const wordCount = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+            wordCountEl.textContent = `Palavras: ${wordCount.toLocaleString('pt-BR')}`;
+            charCountEl.textContent = `Caracteres: ${charCount.toLocaleString('pt-BR')}`;
+        }
+
+        // PROMPT ADAPTADO PARA GERAR ROTEIRO EM ESPANHOL
+        function buildOldWestPromptForPart(partNumber, totalParts, title, previousScript) {
+            const baseInstructions = `
+                Eres un maestro narrador del Viejo Oeste Americano. Tu tarea es escribir un guion crudo, apasionante y moralmente complejo basado en el título de un video. El guion completo debe estar en un español mexicano fluido y natural.
+
+                **Fórmula Narrativa Central:**
+                - **Idioma:** 100% Español de México.
+                - **Narración:** En tercera persona, con una voz de documental ruda y empática, que describe tanto el paisaje hostil como las luchas internas de los personajes.
+                - **Protagonista:** El personaje principal es un hombre solitario y de principios del Oeste (ej. un ranchero, un ex-sheriff, un trampero), a menudo un recluso debido a una tragedia pasada.
+                - **Incidente Inicial:** La historia debe comenzar con la llegada inesperada de uno o más nativos americanos vulnerables a la propiedad aislada del protagonista, creando un dilema moral inmediato y de alto riesgo.
+                - **La Decisión Moral:** El protagonista debe elegir ayudarlos, desafiando los prejuicios de la época y aceptando un gran riesgo personal.
+                - **Antagonista:** El verdadero villano es un hombre blanco corrupto (o un grupo) en una posición de poder (ej. un sheriff, un oficial militar, un empresario) que explota las tensiones raciales para su beneficio personal.
+                - **El Giro Inesperado (The Twist):** La historia debe contener una revelación clave que cambie la dinámica, como la verdadera identidad de los personajes nativos americanos o el descubrimiento de la conspiración del antagonista.
+                - **Resolución:** El conflicto debe resolverse a través de la inteligencia, la revelación de la verdad y alianzas inesperadas, en lugar de un simple tiroteo. El antagonista corrupto es expuesto y derrotado.
+                - **CRÍTICO: Pureza del Contenido:** Tu respuesta DEBE SER ÚNICAMENTE las palabras habladas por el narrador. NO incluyas comentarios entre paréntesis como "(desenfunda su arma)" o "(sonríe)", descripciones de acciones, escenarios, o cualquier texto que no sea parte de la narración directa. El guion debe ser absolutamente limpio y listo para una IA de narración.
+            `;
+            const middlePart = Math.ceil(totalParts / 2);
+            if (partNumber === 1) {
+                return `${baseInstructions}\n\n**Tarea Actual:**\nEstás escribiendo la **Parte 1 de ${totalParts}**. Es la introducción. Debe tener alrededor de 1000 palabras.\n**Título del Video (en Español):** "${title}"\n**Gancho de Apertura:** Comienza con una frase de apertura poderosa e impactante en español que establezca inmediatamente lo que está en juego y esté directamente inspirada en el título del video. Presenta al protagonista solitario y su entorno aislado. Luego, ejecuta el "Incidente Inicial". **Incluye aquí el primero de los tres ganchos naturales para comentarios.**`;
+            } else if (partNumber === middlePart) {
+                 const context = previousScript.split(' ').slice(-200).join(' ');
+                 return `${baseInstructions}\n\n**Tarea Actual:**\nEstás escribiendo la **Parte ${partNumber} de ${totalParts}**. Es la mitad de la historia. Escala el conflicto. El antagonista corrupto debe llegar y confrontar al protagonista. Aquí es donde debe ocurrir el "Giro Inesperado". **Incluye aquí el segundo de los tres ganchos para comentarios.**\n\n**Contexto Anterior:**\n"...${context}"\n\nContinúa la narrativa desde donde terminó.`;
+            } else if (partNumber === totalParts) {
+                 const context = previousScript.split(' ').slice(-200).join(' ');
+                 return `${baseInstructions}\n\n**Tarea Actual:**\nEstás escribiendo la **Parte Final, ${partNumber} de ${totalParts}**. Es la conclusión. Resuelve el conflicto principal. El antagonista debe ser derrotado. Concluye con una reflexión poderosa. **Incluye aquí el tercer y último gancho para comentarios.**\n\n**Contexto Anterior:**\n"...${context}"\n\nContinúa desde ahí para escribir los pensamientos finales.`;
+            } else {
+                const context = previousScript.split(' ').slice(-200).join(' ');
+                return `${baseInstructions}\n\n**Tarea Actual:**\nEstás continuando la historia. Escribe la **Parte ${partNumber} de ${totalParts}**. Desarrolla la trama hacia el siguiente punto importante. NO incluyas un gancho para comentarios en esta parte.\n**Título del Video (en Español):** "${title}"\n\n**Contexto Anterior:**\n"...${context}"\n\nContinúa la narrativa exactamente donde terminó.`;
+            }
+        }
+        
+        async function handleGenerateScript() {
+            if (isGeneratingScript) return;
+            const title = videoTitleInput.value.trim();
+            const totalParts = parseInt(partsCountInput.value, 10);
+            if (!title) { alert('Por favor, insira um título para o vídeo.'); return; }
+            if (isNaN(totalParts) || totalParts < 3) { alert('O número de partes deve ser no mínimo 3.'); return; }
+
+            isGeneratingScript = true;
+            fullScript = '';
+            scriptOutput.value = '';
+            updateCounters();
+            updateUIState(true);
+
+            try {
+                for (let i = 1; i <= totalParts; i++) {
+                    statusText.textContent = `Gerando parte ${i} de ${totalParts}...`;
+                    const prompt = buildOldWestPromptForPart(i, totalParts, title, fullScript);
+                    const newPart = await callChatGPTAPI(prompt);
+                    fullScript += (fullScript ? '\n\n' : '') + newPart;
+                    scriptOutput.value = fullScript;
+                    scriptOutput.scrollTop = scriptOutput.scrollHeight;
+                    updateCounters();
+                    progressBar.style.width = `${(i / totalParts) * 100}%`;
+                }
+                statusText.textContent = 'Roteiro gerado com sucesso!';
+            } catch (error) {
+                console.error('Erro ao gerar o roteiro:', error);
+                statusText.textContent = `Erro: ${error.message}. Por favor, tente novamente.`;
+                scriptOutput.value += "\n\n--- GERAÇÃO INTERROMPIDA DEVIDO A UM ERRO ---";
+            } finally {
+                isGeneratingScript = false;
+                updateUIState(false);
+            }
+        }
+
+        async function handleImagePromptAction(button, copyBtn, targetId) {
+            const withArrow = button.dataset.arrow === 'true';
+            const textarea = document.getElementById(targetId);
+
+            const title = videoTitleInput.value.trim();
+            if (!title) {
+                alert('Por favor, insira um título para o vídeo antes de gerar um prompt de imagem.');
+                return;
+            }
+            
+            button.disabled = true;
+            copyBtn.classList.add('hidden');
+            textarea.value = "Gerando...";
+
+            const imagePromptInstruction = `
+                Analyze the video title provided below (which is in Spanish). Your task is to generate a single, creative image prompt in English for an AI like Sora or Midjourney. The goal is to create an image that is **indistinguishable from a real photograph**.
+
+                **CRITICAL Style Instructions:**
+                - **Realism:** The absolute priority is photorealism. The image must look like a real photo, not a drawing, painting, or 3D render. Use terms like "ultrarealistic photo," "photorealistic," "8k UHD," "cinematic movie still."
+                - **Texture and Detail:** Emphasize details like "ultra-detailed skin texture," "realistic fabric," "weathered wood," "dust particles in the air."
+                - **Lighting:** Describe the lighting as "natural daylight," "harsh midday sun," or "dramatic golden hour lighting." Avoid artificial or overly stylized lighting.
+                - **Camera:** Frame it as if taken by a real camera, e.g., "shot on 35mm film," "candid shot," "shallow depth of field."
+                - **Content:** The scene must visually represent the core context or conflict of the provided video title. Identify all key characters or groups mentioned in the title and include them in the scene description.
+                ${withArrow ? "- **Special Element:** The final image MUST include a large, bold, red, 2D cartoon-style arrow pointing to the most interesting or mysterious part of the scene to generate curiosity. This arrow is the only non-realistic element." : ""}
+                - **Output:** Your response must be ONLY the prompt text itself, with no extra explanations, titles, or quotes.
+
+                **Video Title (in Spanish):** "${title}"
+            `;
+            
+            try {
+                const imagePrompt = await callChatGPTAPI(imagePromptInstruction);
+                textarea.value = imagePrompt;
+                copyBtn.classList.remove('hidden');
+            } catch (error) {
+                console.error("Erro ao gerar prompt de imagem:", error);
+                textarea.value = `Erro: ${error.message}`;
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        async function callChatGPTAPI(prompt) {
+            const userApiKey = apiKeyInput.value.trim();
+            if (!userApiKey) { throw new Error("A Chave da API da OpenAI é obrigatória."); }
+            const apiUrl = 'https://api.openai.com/v1/chat/completions';
+            const payload = { model: "gpt-4o-mini", messages: [{ "role": "system", "content": "You are a creative assistant specialized in generating scripts and prompts for AI." }, { "role": "user", "content": prompt }], temperature: 0.8, top_p: 0.95 };
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${userApiKey}` }, body: JSON.stringify(payload) });
+            if (!response.ok) {
+                const errorBody = await response.json();
+                throw new Error(`Erro na API do ChatGPT: ${errorBody.error.message}`);
+            }
+            const result = await response.json();
+            if (result.choices && result.choices[0]) {
+                return result.choices[0].message.content;
+            } else {
+                throw new Error('Não foi possível extrair o texto da resposta da API do ChatGPT.');
+            }
+        }
+
+        function handleCopy(textareaElement, buttonElement) {
+            if (!textareaElement.value || textareaElement.value.startsWith("Erro:")) return;
+            try {
+                textareaElement.select();
+                document.execCommand('copy');
+                const originalContent = buttonElement.innerHTML;
+                buttonElement.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-lg" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>`;
+                setTimeout(() => { 
+                   buttonElement.innerHTML = originalContent;
+                 }, 2000);
+            } catch (err) {
+                console.error('Falha ao copiar: ', err);
+            }
+            window.getSelection()?.removeAllRanges();
+        }
+
+        function handleDownloadScript() {
+            if (isGeneratingScript || !fullScript) return;
+            const title = videoTitleInput.value.trim().replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'guion_lejano_oeste';
+            const fileContent = `TÍTULO DEL VIDEO: ${videoTitleInput.value.trim()}\n\n---\n\n${fullScript}`;
+            const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${title}.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        }
+        
+        function updateUIState(isLoading) {
+            generateButton.disabled = isLoading;
+            apiKeyInput.disabled = isLoading;
+            videoTitleInput.disabled = isLoading;
+            partsCountInput.disabled = isLoading;
+            downloadButton.disabled = isLoading || !fullScript;
+            imagePromptBtns.forEach(btn => btn.disabled = isLoading);
+            if (isLoading) {
+                generateButton.classList.add('opacity-50', 'cursor-not-allowed');
+                statusContainer.classList.remove('hidden');
+                progressBar.style.width = '0%';
+            } else {
+                generateButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        updateCounters();
+        updateUIState(false);
+    </script>
+</body>
+</html>
