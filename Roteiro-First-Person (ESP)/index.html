@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de Roteiros em Espanhol (ChatGPT)</title>
+    <title>Roteiros - Primeira Pessoa (Espanhol - ChatGPT)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,15 +43,15 @@
 
     <div class="w-full max-w-4xl bg-gray-900 rounded-2xl shadow-2xl shadow-black/50 p-6 md:p-8 space-y-6 main-panel-border">
         
-        <!-- Cabeçalho em Português -->
+        <!-- Cabeçalho -->
         <div class="text-center">
-            <h1 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Gerador de Roteiros em Espanhol (ChatGPT)</h1>
-            <h2 class="text-lg text-gray-400 mt-2">Historias en Primera Persona (en Español)</h2>
+            <h1 class="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Gerador de Roteiros (Espanhol)</h1>
+            <h2 class="text-lg text-gray-400 mt-2">Histórias em Primeira Pessoa</h2>
             <p class="text-xs text-gray-500 mt-1">APP BY: G2R DIGITAL CORPORATION LTDA</p>
-            <p class="text-gray-400 mt-4">Insira o título, tome um café e veja seu roteiro ficar pronto em segundos...</p>
+            <p class="text-gray-400 mt-4">Insira o título, tome um café e veja seu roteiro ficar pronto em alguns segundos...</p>
         </div>
 
-        <!-- Área de Input em Português -->
+        <!-- Área de Input -->
         <div class="space-y-4">
             <div class="space-y-2">
                 <label for="apiKeyInput" class="block text-sm font-medium text-gray-400">Chave da API da OpenAI</label>
@@ -63,7 +63,7 @@
             
             <div class="space-y-2">
                 <label for="partsCount" class="block text-sm font-medium text-gray-400">Quantas partes você deseja? (mínimo 3)</label>
-                <input type="number" id="partsCount" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" value="16" min="3">
+                <input type="number" id="partsCount" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition" value="10" min="3">
             </div>
 
             <button id="generateButton" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-lg flex items-center justify-center space-x-2 btn-premium">
@@ -80,7 +80,7 @@
             </div>
         </div>
 
-        <!-- Área de Output em Português -->
+        <!-- Área de Output -->
         <div class="space-y-2">
             <div class="flex justify-between items-center">
                 <label for="scriptOutput" class="block text-sm font-medium text-gray-400">Roteiro Gerado (em Espanhol):</label>
@@ -101,6 +101,38 @@
                 <span id="charCount">Caracteres: 0</span>
             </div>
         </div>
+        
+        <!-- SEÇÃO PROMPTS DE IMAGEM -->
+        <div id="imagePromptSection" class="pt-4 space-y-4">
+            <h3 class="text-xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Prompt para Imagem</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-400">Opção 1</label>
+                    <div class="flex items-center space-x-2">
+                        <textarea id="prompt1" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-400 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" readonly placeholder="Clique em 'Gerar'..."></textarea>
+                        <div class="flex flex-col space-y-2">
+                            <button data-target="prompt1" class="image-prompt-btn bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold p-2 rounded-lg transition-colors text-xs">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-stars" viewBox="0 0 16 16"><path d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.73 1.73 0 0 0 4.593 5.9l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.9A1.73 1.73 0 0 0 2.31 4.807l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.73 1.73 0 0 0 3.407 2.31zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/></svg>
+                            </button>
+                            <button data-target="prompt1" class="copy-prompt-btn hidden bg-blue-600 hover:bg-blue-500 p-2 rounded-lg transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 7a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.5-.5z"/></svg></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-gray-400">Opção 2</label>
+                    <div class="flex items-center space-x-2">
+                        <textarea id="prompt2" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-gray-400 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none" readonly placeholder="Clique em 'Gerar'..."></textarea>
+                        <div class="flex flex-col space-y-2">
+                           <button data-target="prompt2" class="image-prompt-btn bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold p-2 rounded-lg transition-colors text-xs">
+                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-stars" viewBox="0 0 16 16"><path d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.73 1.73 0 0 0 4.593 5.9l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.9A1.73 1.73 0 0 0 2.31 4.807l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.73 1.73 0 0 0 3.407 2.31zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/></svg>
+                           </button>
+                           <button data-target="prompt2" class="copy-prompt-btn hidden bg-blue-600 hover:bg-blue-500 p-2 rounded-lg transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard" viewBox="0 0 16 16"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zM-1 7a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H4a.5.5 0 0 1-.5-.5z"/></svg></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script type="module">
@@ -117,15 +149,22 @@
         const downloadButton = document.getElementById('downloadButton');
         const wordCountEl = document.getElementById('wordCount');
         const charCountEl = document.getElementById('charCount');
+        const imagePromptBtns = document.querySelectorAll('.image-prompt-btn');
 
         // --- Variáveis de Estado ---
-        let isGenerating = false;
+        let isGeneratingScript = false;
         let fullScript = '';
         
         // --- Event Listeners ---
         generateButton.addEventListener('click', handleGenerateScript);
-        copyButton.addEventListener('click', handleCopyScript);
+        copyButton.addEventListener('click', () => handleCopy(scriptOutput, copyButton));
         downloadButton.addEventListener('click', handleDownloadScript);
+        imagePromptBtns.forEach(btn => {
+            const targetId = btn.dataset.target;
+            const copyBtn = btn.parentElement.querySelector('.copy-prompt-btn');
+            btn.addEventListener('click', () => handleImagePromptAction(btn, copyBtn, targetId));
+            copyBtn.addEventListener('click', () => handleCopy(document.getElementById(targetId), copyBtn));
+        });
 
         function updateCounters() {
             const text = scriptOutput.value;
@@ -137,54 +176,45 @@
 
         function buildPromptForPart(partNumber, totalParts, title, previousScript) {
             const baseInstructions = `
-                Analiza las siguientes instrucciones para generar una parte de una historia larga.
-                Tu tarea es escribir un guion en Español de México.
+                You are a creative scriptwriter. Your task is to write a script in Mexican Spanish based on the following instructions.
 
-                **Instrucciones Narrativas Clave:**
-                - **Longitud Total:** ${totalParts} partes de ~1000 palabras cada una.
-                - **Punto de Vista:** Narrador en primera persona (siempre femenino).
-                - **Idioma:** 100% Español de México.
-                - **Estilo:** Estilo documental, narración en primera persona. El tono debe ser personal, cercano y auténtico.
-                - **Ganchos para Comentarios:** DEBES incluir exactamente TRES preguntas o ganchos para que la audiencia comente a lo largo de todo el guion. Coloca uno en la primera parte, uno en la parte intermedia y uno en la parte final. Ejemplo: "¿Qué hubieras hecho tú? Déjamelo saber en los comentarios."
-                - **Estructura:**
-                    1. La PRIMERA parte debe ser una introducción poderosa con un gancho fuerte.
-                    2. La ÚLTIMA parte debe ser una conclusión extensa y satisfactoria.
-                - **Formato:** El resultado debe ser un único bloque de texto continuo. Sin títulos de capítulo, sin saltos.
-                - **CRÍTICO: Pureza del Contenido:** Tu respuesta DEBE SER ÚNICAMENTE las palabras habladas por el narrador. NO incluyas comentarios entre paréntesis, descripciones de acciones (como "Él sonríe"), descripciones de escenas, direcciones de cámara o cualquier texto que no sea parte de la narración directa. El resultado debe ser un guion limpio y listo para un motor de texto a voz.
+                **Core Narrative Instructions:**
+                - **Total Length:** ${totalParts} parts of ~1000 words each.
+                - **Point of View:** First-person narrator (always female).
+                - **Language:** 100% Mexican Spanish.
+                - **Style:** Documentary-style, first-person storytelling. The tone must be personal, relatable, and authentic.
+                - **Comment Hooks:** You MUST include exactly THREE natural-sounding questions for the audience to comment on throughout the entire script. Place one in the first part, one in the middle part, and one in the final part. Example: "¿Qué hubieras hecho tú? Déjamelo saber en los comentarios."
+                - **Structure:**
+                    1. The FIRST part must be a powerful introduction with a strong hook.
+                    2. The LAST part must be an extensive and satisfying conclusion.
+                - **Format:** The output must be a single, continuous block of text. No chapter titles, no breaks.
+                - **CRITICAL: Content Purity:** Your response MUST BE ONLY the spoken words of the narrator. Do NOT include any parenthetical remarks, action descriptions (like "(sonríe)"), scene settings, camera directions, or any text that is not part of the direct narration. The output must be a clean script ready for a text-to-speech engine.
             `;
-
+            
             const middlePart = Math.ceil(totalParts / 2);
 
             if (partNumber === 1) {
-                return `${baseInstructions}\n\n**Tarea Actual:**\nEstás escribiendo la **Parte 1 de ${totalParts}**. Esta es la introducción. Debe tener alrededor de 1000 palabras.\nEl título del video es: **"${title}"**.\n**Mandato de Nombramiento e Introducción del Personaje:** DEBES comenzar el guion presentando al personaje principal femenino. Dale un nombre hispano (español/mexicano) único y creíble que sea relevante para el contexto del título. Evita usar siempre los mismos nombres o nombres muy parecidos (ej. Sofía, Valentina, etc.). Sé creativo con la elección del nombre en cada historia. Describe brevemente quién es este personaje recién nombrado.\n**Mandato de Variedad en la Apertura:** La introducción del personaje debe fluir hacia un gancho poderoso. Tienes estrictamente prohibido usar frases de apertura genéricas. Las primeras frases deben ser únicas para esta historia y enganchar inmediatamente al lector en el conflicto central. Después del gancho, comienza el flashback. **Crucialmente, debes incluir el PRIMERO de los tres ganchos para comentarios de forma natural dentro de esta parte.** Recuerda la regla de Pureza del Contenido: solo narración.`;
+                return `${baseInstructions}\n\n**Current Task:**\nYou are writing **Part 1 of ${totalParts}**. This is the introduction. It must be around 1000 words.\nThe video title is: **"${title}"**.\n**Character Naming Mandate:** You MUST give the female main character a common, but not overly-used, Hispanic name (e.g., Sofia, Valentina, Isabella). It is critical that every single script has a different protagonist name. Be creative and actively avoid repeating names you may have used in previous generations. Do not use very similar sounding names either.\n**Main Character Introduction:** You MUST start the script by introducing this newly named female main character. Briefly describe who she is in a way that is contextually relevant to the video title. This introduction should flow directly into the main story hook.\n**Opening Variety Mandate:** You are strictly forbidden from using generic opening phrases. The first sentences must be powerful, unique to this story, and immediately hook the reader into the core conflict. After the character introduction and hook, begin the flashback. **Crucially, you must include the FIRST of the three comment hooks naturally within this part.** Remember the Content Purity rule: only narration.`;
             } else if (partNumber === middlePart) {
                  const context = previousScript.split(' ').slice(-200).join(' ');
-                 return `${baseInstructions}\n\n**Tarea Actual:**\nEstás escribiendo la **Parte ${partNumber} de ${totalParts}**. Esta es la mitad de la historia. Debe tener alrededor de 1000 palabras.\n**Crucialmente, debes incluir el SEGUNDO de los tres ganchos para comentarios de forma natural dentro de esta parte,** relacionándolo con los eventos actuales de la narrativa.\nRecuerda la regla de Pureza del Contenido.\n\nAquí está el final de la parte anterior para darte contexto:\n"...${context}"\n\nContinúa la narrativa desde donde se quedó.`;
+                 return `${baseInstructions}\n\n**Current Task:**\nYou are writing **Part ${partNumber} of ${totalParts}**. This is the middle of the story. It must be around 1000 words.\n**Crucially, you must include the SECOND of the three comment hooks naturally within this part,** relating it to the current events of the narrative.\nRemember the Content Purity rule.\n\nHere is the end of the previous part to give you context:\n"...${context}"\n\nContinue the narrative from where it left off.`;
             } else if (partNumber === totalParts) {
                  const context = previousScript.split(' ').slice(-200).join(' ');
-                 return `${baseInstructions}\n\n**Tarea Actual:**\nEstás escribiendo la **Parte Final, ${partNumber} de ${totalParts}**. Esta es la conclusión. Debe tener alrededor de 1000 palabras.\nCierra la historia, resuelve el conflicto principal y proporciona un final satisfactorio. **Crucialmente, debes incluir el TERCER y ÚLTIMO gancho para comentarios de forma natural dentro de esta parte final.** Recuerda la regla de Pureza del Contenido.\n\nAquí está el final de la parte anterior para darte contexto:\n"...${context}"\n\nContinúa desde ahí para escribir los pensamientos finales.`;
+                 return `${baseInstructions}\n\n**Current Task:**\nYou are writing the **Final Part, ${partNumber} of ${totalParts}**. This is the conclusion. It must be around 1000 words.\nWrap up the story and resolve the main conflict. **Crucially, you must include the THIRD and FINAL comment hook naturally within this concluding part.** Remember the Content Purity rule.\n\nHere is the end of the previous part to give you context:\n"...${context}"\n\nContinue from there to write the final thoughts.`;
             } else {
                 const context = previousScript.split(' ').slice(-200).join(' ');
-                return `${baseInstructions}\n\n**Tarea Actual:**\nEstás continuando una historia. Debes escribir la **Parte ${partNumber} de ${totalParts}**. Debe tener alrededor de 1000 palabras. NO incluyas un gancho para comentarios en esta parte.\nEl título del video es: **"${title}"**.\nRecuerda la regla de Pureza del Contenido: solo narración.\n\nAquí está el final de la parte anterior para darte contexto:\n"...${context}"\n\nContinúa la narrativa exactamente donde se quedó.`;
+                return `${baseInstructions}\n\n**Current Task:**\nYou are continuing the story. You must write **Part ${partNumber} of ${totalParts}**. It must be around 1000 words. Do NOT include a comment hook in this part.\nThe video title is: **"${title}"**.\nRemember the Content Purity rule: only narration.\n\nHere is the end of the previous part to give you context:\n"...${context}"\n\nContinue the narrative from exactly where it left off.`;
             }
         }
         
         async function handleGenerateScript() {
-            if (isGenerating) return;
-            
+            if (isGeneratingScript) return;
             const title = videoTitleInput.value.trim();
             const totalParts = parseInt(partsCountInput.value, 10);
+            if (!title) { alert('Por favor, insira um título para o vídeo.'); return; }
+            if (isNaN(totalParts) || totalParts < 3) { alert('O número de partes deve ser no mínimo 3.'); return; }
 
-            if (!title) {
-                alert('Por favor, insira um título para o vídeo.');
-                return;
-            }
-            if (isNaN(totalParts) || totalParts < 3) {
-                alert('O número de partes deve ser no mínimo 3.');
-                return;
-            }
-
-            isGenerating = true;
+            isGeneratingScript = true;
             fullScript = '';
             scriptOutput.value = '';
             updateCounters();
@@ -192,18 +222,14 @@
 
             try {
                 for (let i = 1; i <= totalParts; i++) {
-                    statusText.textContent = `Gerando Parte ${i} de ${totalParts}... (Isso pode levar um momento)`;
-                    
+                    statusText.textContent = `Gerando parte ${i} de ${totalParts}...`;
                     const prompt = buildPromptForPart(i, totalParts, title, fullScript);
-                    const newPart = await callChatGPTAPI(prompt); // MUDANÇA AQUI
-
+                    const newPart = await callChatGPTAPI(prompt);
                     fullScript += (fullScript ? '\n\n' : '') + newPart;
                     scriptOutput.value = fullScript;
                     scriptOutput.scrollTop = scriptOutput.scrollHeight;
                     updateCounters();
-                    
-                    const progressPercentage = (i / totalParts) * 100;
-                    progressBar.style.width = `${progressPercentage}%`;
+                    progressBar.style.width = `${(i / totalParts) * 100}%`;
                 }
                 statusText.textContent = 'Roteiro gerado com sucesso!';
             } catch (error) {
@@ -211,76 +237,74 @@
                 statusText.textContent = `Erro: ${error.message}. Por favor, tente novamente.`;
                 scriptOutput.value += "\n\n--- GERAÇÃO INTERROMPIDA DEVIDO A UM ERRO ---";
             } finally {
-                isGenerating = false;
+                isGeneratingScript = false;
                 updateUIState(false);
             }
         }
-        
-        /**
-         * NOVA FUNÇÃO PARA CHAMAR A API DO CHATGPT (OPENAI)
-         */
+
+        async function handleImagePromptAction(button, copyBtn, targetId) {
+            const textarea = document.getElementById(targetId);
+            const title = videoTitleInput.value.trim();
+            if (!title) {
+                alert('Por favor, insira um título para o vídeo antes de gerar um prompt de imagem.');
+                return;
+            }
+            
+            button.disabled = true;
+            copyBtn.classList.add('hidden');
+            textarea.value = "Gerando...";
+
+            const imagePromptInstruction = `
+                Analyze the video title provided below (which is in Spanish). Your task is to generate a single, creative image prompt in English for an AI like Sora or Midjourney.
+                
+                **CRITICAL Style Instructions:**
+                - **Realism:** The absolute priority is photorealism. The image must look like a real photo from a modern digital camera, not a drawing, painting, or 3D render. Use terms like "ultrarealistic photo," "photorealistic," "8k UHD," "cinematic still."
+                - **Content:** The scene must visually represent the core context or conflict of the provided video title. The main female character should be the central focus of the image, and the scene should include elements mentioned in the title.
+                - **Output:** Your response must be ONLY the prompt text itself, with no extra explanations, titles, or quotes.
+
+                **Video Title (in Spanish):** "${title}"
+            `;
+            
+            try {
+                const imagePrompt = await callChatGPTAPI(imagePromptInstruction);
+                textarea.value = imagePrompt;
+                copyBtn.classList.remove('hidden');
+            } catch (error) {
+                console.error("Erro ao gerar prompt de imagem:", error);
+                textarea.value = `Erro: ${error.message}`;
+            } finally {
+                button.disabled = false;
+            }
+        }
+
         async function callChatGPTAPI(prompt) {
             const userApiKey = apiKeyInput.value.trim();
-
-            if (!userApiKey) {
-                throw new Error("A Chave da API da OpenAI é obrigatória e não foi fornecida.");
-            }
-
+            if (!userApiKey) { throw new Error("A Chave da API da OpenAI é obrigatória."); }
             const apiUrl = 'https://api.openai.com/v1/chat/completions';
-            
-            const payload = {
-                model: "gpt-4o-mini", // Modelo recomendado: eficiente e de alta qualidade
-                messages: [
-                    {
-                        "role": "system",
-                        "content": "You are a creative scriptwriter specialized in writing long, engaging, first-person narrative stories in Mexican Spanish for social media videos."
-                    },
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ],
-                temperature: 0.75,
-                top_p: 0.95,
-            };
-
-            const response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${userApiKey}`
-                },
-                body: JSON.stringify(payload)
-            });
-
+            const payload = { model: "gpt-4o-mini", messages: [{ "role": "system", "content": "You are a creative assistant specialized in generating scripts and prompts for AI." }, { "role": "user", "content": prompt }], temperature: 0.8, top_p: 0.95 };
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${userApiKey}` }, body: JSON.stringify(payload) });
             if (!response.ok) {
                 const errorBody = await response.json();
-                console.error("API Error:", errorBody);
                 throw new Error(`Erro na API do ChatGPT: ${errorBody.error.message}`);
             }
-
             const result = await response.json();
-
             if (result.choices && result.choices[0]) {
                 return result.choices[0].message.content;
             } else {
-                console.error("Resposta inesperada da API do ChatGPT:", result);
                 throw new Error('Não foi possível extrair o texto da resposta da API do ChatGPT.');
             }
         }
 
-        function handleCopyScript() {
-            if (!scriptOutput.value) return;
+        function handleCopy(textareaElement, buttonElement) {
+            if (!textareaElement.value || textareaElement.value.startsWith("Erro:")) return;
             try {
-                scriptOutput.select();
-                scriptOutput.setSelectionRange(0, 99999); 
+                textareaElement.select();
                 document.execCommand('copy');
-                const originalText = copyButton.innerHTML;
-                copyButton.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    <span>Copiado!</span>
-                `;
-                setTimeout(() => { copyButton.innerHTML = originalText; }, 2000);
+                const originalContent = buttonElement.innerHTML;
+                buttonElement.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check-lg" viewBox="0 0 16 16"><path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022z"/></svg>`;
+                setTimeout(() => { 
+                   buttonElement.innerHTML = originalContent;
+                 }, 2000);
             } catch (err) {
                 console.error('Falha ao copiar: ', err);
             }
@@ -288,17 +312,13 @@
         }
 
         function handleDownloadScript() {
-            if (isGenerating || !fullScript) return;
-
+            if (isGeneratingScript || !fullScript) return;
             const title = videoTitleInput.value.trim().replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'guion_generado';
             const fileContent = `TÍTULO DEL VIDEO: ${videoTitleInput.value.trim()}\n\n---\n\n${fullScript}`;
-            
             const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
-
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.download = `${title}.txt`;
-            
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -307,11 +327,11 @@
         
         function updateUIState(isLoading) {
             generateButton.disabled = isLoading;
-            videoTitleInput.disabled = isLoading;
             apiKeyInput.disabled = isLoading;
+            videoTitleInput.disabled = isLoading;
             partsCountInput.disabled = isLoading;
             downloadButton.disabled = isLoading || !fullScript;
-
+            imagePromptBtns.forEach(btn => btn.disabled = isLoading);
             if (isLoading) {
                 generateButton.classList.add('opacity-50', 'cursor-not-allowed');
                 statusContainer.classList.remove('hidden');
